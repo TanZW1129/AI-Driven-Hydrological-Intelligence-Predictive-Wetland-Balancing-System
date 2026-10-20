@@ -5,3 +5,7 @@ dist
 .vite
 .DS_Store
 *.tsbuildinfo
+
+# Local plans and implementation drafts (not uploaded to GitHub)
+plans/
+*plan*.md
