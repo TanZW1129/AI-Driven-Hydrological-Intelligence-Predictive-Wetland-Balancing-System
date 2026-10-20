@@ -191,7 +191,7 @@ export function WetlandBasinMesh({
 
         {/* Upstream Label */}
         <Html position={[0, BANK_HEIGHT_Y + 1.3, 0]} center distanceFactor={24} zIndexRange={[10, 0]}>
-          <div className="pointer-events-none select-none rounded-lg border border-slate-700 bg-slate-900/90 px-2.5 py-1 text-center font-mono text-[11px] shadow-md backdrop-blur">
+          <div className="pointer-events-none select-none whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900/90 px-2.5 py-1 text-center font-mono text-[11px] shadow-md backdrop-blur">
             <div className="text-[9px] text-slate-400">上游 500ha 汇水入流 (Q_in)</div>
             <div className="text-xs font-bold text-sky-400">
               {inflowM3PerS.toFixed(1)} m³/s

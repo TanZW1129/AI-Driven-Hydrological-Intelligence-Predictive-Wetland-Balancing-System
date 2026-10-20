@@ -1,18 +1,25 @@
 /**
  * @file WetlandSceneCanvas.tsx
- * @description Main 3D Digital Twin viewport container combining the 125-acre
- * wetland basin, ultrasonic gauge tower, motorized dual-bay sluice gate and
- * downstream Klang tidal channel with HUD camera preset controls.
+ * @description Full-width hero 3D Digital Twin viewport container combining the
+ * 125-acre wetland basin, ultrasonic gauge tower, motorized sluice gate and
+ * downstream Klang tidal channel with HUD status overlays.
  */
 
 import { Canvas } from '@react-three/fiber';
-import { Camera, Eye, EyeOff, Layers } from 'lucide-react';
+import { Camera, Eye, EyeOff, Layers, Radio } from 'lucide-react';
 import { Suspense } from 'react';
 import {
   selectEffectiveFrame,
+  selectTimeContext,
   useSimulationStore,
   type CameraViewPreset,
 } from '../../store/simulationStore';
+import {
+  formatClock,
+  formatOffsetFromNow,
+  formatRelativeClock,
+  formatShortDate,
+} from '../../utils/timeFormat';
 import { CameraController } from './CameraController';
 import { DownstreamBasinMesh } from './DownstreamBasinMesh';
 import { LevelGaugeMarker } from './LevelGaugeMarker';
@@ -30,22 +37,43 @@ const PRESET_BUTTONS: ReadonlyArray<{ id: CameraViewPreset; label: string }> = [
 export function WetlandSceneCanvas() {
   const state = useSimulationStore();
   const effective = selectEffectiveFrame(state);
+  const timeCtx = selectTimeContext(state);
+
+  const timeBadgeText =
+    timeCtx.mode === 'LIVE'
+      ? `${formatShortDate(timeCtx.cursorMs)} ${formatClock(timeCtx.cursorMs)} MYT (${formatOffsetFromNow(timeCtx.offsetFromNowSec)})`
+      : formatRelativeClock(timeCtx.elapsedSec);
 
   return (
-    <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
-      {/* Top-Left HUD Overlay: Scene Title & Legend */}
-      <div className="pointer-events-none absolute left-3.5 top-3.5 z-10 flex flex-col gap-1.5">
+    <div className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+      {/* Top-Left HUD Overlay: Scene Status & Legend */}
+      <div className="pointer-events-none absolute left-3.5 top-3 z-10 flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/85 px-3 py-1.5 backdrop-blur">
           <Layers className="h-4 w-4 text-cyan-400" />
           <span className="text-xs font-semibold text-white">
-            BBR 125英亩湿地 — 3D 实时数字孪生沙盘
+            BBR 125英亩湿地 3D 数字孪生沙盘
           </span>
-          <span className="rounded bg-cyan-950 px-1.5 py-0.5 font-mono text-[10px] text-cyan-300">
-            T+{effective.hourOffset.toFixed(1)}h
+          <span
+            className={`flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[10px] font-semibold ${
+              timeCtx.mode === 'LIVE'
+                ? timeCtx.isForecast
+                  ? 'bg-amber-950/90 text-amber-300 border border-amber-700/60'
+                  : 'bg-emerald-950/90 text-emerald-300 border border-emerald-700/60'
+                : 'bg-purple-950/90 text-purple-300 border border-purple-700/60'
+            }`}
+          >
+            <Radio className="h-2.5 w-2.5 animate-pulse" />
+            {timeCtx.mode === 'LIVE'
+              ? timeCtx.isForecast
+                ? `未来推演 · ${timeBadgeText}`
+                : timeCtx.isHindcast
+                  ? `历史回溯 · ${timeBadgeText}`
+                  : `实时实况 · ${timeBadgeText}`
+              : `模拟推演 · ${timeBadgeText}`}
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 rounded-xl border border-slate-800/80 bg-slate-950/80 px-3 py-1.5 font-mono text-[10px] text-slate-300 backdrop-blur">
+        <div className="hidden items-center gap-2.5 rounded-xl border border-slate-800/80 bg-slate-950/80 px-3 py-1.5 font-mono text-[10px] text-slate-300 backdrop-blur xl:flex">
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
             1.0m 生态底线
@@ -68,7 +96,7 @@ export function WetlandSceneCanvas() {
       </div>
 
       {/* Top-Right HUD Overlay: Camera Presets & Ghost Toggle */}
-      <div className="absolute right-3.5 top-3.5 z-10 flex flex-wrap items-center gap-1.5">
+      <div className="absolute right-3.5 top-3 z-10 flex flex-wrap items-center gap-1.5">
         <div className="flex items-center gap-1 rounded-xl border border-slate-700/80 bg-slate-900/85 p-1 backdrop-blur">
           <Camera className="ml-1.5 h-3.5 w-3.5 text-slate-400" />
           {PRESET_BUTTONS.map((btn) => (
@@ -102,13 +130,17 @@ export function WetlandSceneCanvas() {
           ) : (
             <EyeOff className="h-3.5 w-3.5" />
           )}
-          传统水位对比网
+          传统对比网
         </button>
       </div>
 
       {/* Bottom-Left HUD Hint */}
-      <div className="pointer-events-none absolute bottom-3 left-3.5 z-10 rounded-lg bg-slate-950/75 px-2.5 py-1 font-mono text-[10px] text-slate-400 backdrop-blur">
-        鼠标左键: 360°旋转 · 右键: 平移 · 滚轮: 缩放 · 水流方向: 左(上游) → 右(巴生海峡)
+      <div className="pointer-events-none absolute bottom-2.5 left-3.5 z-10 flex items-center gap-3 rounded-lg bg-slate-950/75 px-2.5 py-1 font-mono text-[10px] text-slate-400 backdrop-blur">
+        <span>左键: 360°旋转 · 右键: 平移 · 滚轮: 缩放</span>
+        <span className="text-slate-600">|</span>
+        <span className="text-cyan-300">
+          当前水深: {effective.wetlandLevelM.toFixed(2)}m · 水闸开度: {effective.gateOpeningM.toFixed(2)}m · 出流: {effective.outflowM3PerS.toFixed(1)} m³/s
+        </span>
       </div>
 
       {/* Three.js WebGL Canvas */}
@@ -117,7 +149,7 @@ export function WetlandSceneCanvas() {
         dpr={[1, 2]}
         camera={{
           position: CAMERA_PRESETS.OVERVIEW.position,
-          fov: 42,
+          fov: 40,
           near: 0.5,
           far: 180,
         }}

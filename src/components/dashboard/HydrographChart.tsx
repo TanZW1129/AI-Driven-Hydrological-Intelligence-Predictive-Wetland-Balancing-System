@@ -1,8 +1,13 @@
 /**
  * @file HydrographChart.tsx
- * @description 24-hour comparative hydrograph chart plotting Rainfall Forecast
- * (mm/h), AI Smart Wetland Water Level (m), Traditional Unmanaged Wetland
- * Level (m) and Downstream Tidal Level (m), synchronized with the 3D timeline.
+ * @description Synchronized comparative hydrograph chart plotting Rainfall
+ * Forecast (mm/h), AI Smart Wetland Water Level (m), Traditional Unmanaged
+ * Wetland Level (m) and Downstream Tidal Level (m).
+ *
+ * Adapts automatically between:
+ *   - LIVE mode: Real wall-clock X-axis (HH:mm MYT) with a fixed "NOW" marker
+ *     and a movable lookahead cursor.
+ *   - SIMULATION mode: Relative simulation hours (0h..24h).
  */
 
 import { TrendingDown } from 'lucide-react';
@@ -23,16 +28,19 @@ import {
 } from '../../constants/hydrologyConstants';
 import {
   selectEffectiveFrame,
+  selectTimeContext,
   useSimulationStore,
 } from '../../store/simulationStore';
+import { formatClock, formatRelativeClock, formatShortDate } from '../../utils/timeFormat';
 
 export function HydrographChart() {
   const state = useSimulationStore();
   const effective = selectEffectiveFrame(state);
+  const timeCtx = selectTimeContext(state);
 
   const chartData = state.frames.map((f, index) => ({
     index,
-    hourOffset: f.hourOffset,
+    simTimeSec: f.simTimeSec,
     rainfall: f.rainfallIntensityMmPerHr,
     smartLevel: f.smart.waterLevelM,
     traditionalLevel: f.traditional.waterLevelM,
@@ -40,17 +48,24 @@ export function HydrographChart() {
     gateOpening: f.smart.gateOpeningM,
   }));
 
+  // Clean whole-hour ticks every 2 hours
+  const wholeHourTicks = state.frames
+    .filter((f) => f.simTimeSec % 7_200 === 0)
+    .map((f) => f.simTimeSec);
+
+  const nowFrame =
+    state.appMode === 'LIVE' ? state.frames[state.live.nowFrameIndex] : undefined;
+
   return (
-    <div className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xl">
-      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+    <div className="flex h-full flex-col rounded-xl border border-slate-800 bg-slate-900/90 p-3 shadow-xl">
+      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-2 text-xs font-semibold text-white">
             <TrendingDown className="h-4 w-4 text-cyan-400" />
-            24h 双轨水文历时对比曲线 (AI 智控调蓄 vs 传统固定溢流堰)
+            {state.appMode === 'LIVE'
+              ? '实时实况与未来 24h 排涝预测水文过程线 (点击任意时刻可快进推演)'
+              : '24h 双轨水文历时对比曲线 (AI 智控调蓄 vs 传统固定溢流堰)'}
           </h2>
-          <p className="text-[11px] text-slate-400">
-            点击图表任意时间点可同步跳转 3D 沙盘进度 · 红线 3.5m 为泛滥溢流警戒标高
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 font-mono text-[10px]">
@@ -73,11 +88,11 @@ export function HydrographChart() {
         </div>
       </div>
 
-      <div className="h-56 w-full">
+      <div className="min-h-0 flex-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 8, right: 12, bottom: 0, left: -14 }}
+            margin={{ top: 6, right: 8, bottom: -4, left: -16 }}
             onClick={(nextState) => {
               if (
                 nextState &&
@@ -89,10 +104,16 @@ export function HydrographChart() {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis
-              dataKey="hourOffset"
+              dataKey="simTimeSec"
+              ticks={wholeHourTicks}
               stroke="#64748b"
               fontSize={10}
-              tickFormatter={(v) => `${v}h`}
+              tickFormatter={(sec: number) => {
+                if (state.appMode === 'LIVE') {
+                  return formatClock(timeCtx.seriesStartMs + sec * 1_000);
+                }
+                return `${Math.round(sec / 3_600)}h`;
+              }}
             />
             <YAxis
               yAxisId="level"
@@ -117,7 +138,13 @@ export function HydrographChart() {
                 fontSize: '11px',
                 color: '#f8fafc',
               }}
-              labelFormatter={(label) => `仿真时刻: T+${label} 小时`}
+              labelFormatter={(sec: number) => {
+                if (state.appMode === 'LIVE') {
+                  const ms = timeCtx.seriesStartMs + sec * 1_000;
+                  return `大马时间: ${formatShortDate(ms)} ${formatClock(ms)} MYT`;
+                }
+                return `仿真时刻: ${formatRelativeClock(sec)}`;
+              }}
               formatter={(value: number, name: string) => {
                 if (name === 'rainfall') return [`${value} mm/h`, '降雨强度'];
                 if (name === 'smartLevel') return [`${value.toFixed(2)} m`, 'AI 智控水位'];
@@ -138,7 +165,7 @@ export function HydrographChart() {
               label={{
                 value: '3.5m 临界溢流线',
                 fill: '#ef4444',
-                fontSize: 10,
+                fontSize: 9,
                 position: 'insideTopLeft',
               }}
             />
@@ -157,10 +184,27 @@ export function HydrographChart() {
               }}
             />
 
-            {/* Current Playback Time Vertical Cursor */}
+            {/* LIVE mode: Fixed wall-clock NOW reference line */}
+            {nowFrame !== undefined && (
+              <ReferenceLine
+                yAxisId="level"
+                x={nowFrame.simTimeSec}
+                stroke="#10b981"
+                strokeWidth={1.5}
+                strokeDasharray="2 2"
+                label={{
+                  value: 'NOW',
+                  fill: '#10b981',
+                  fontSize: 9,
+                  position: 'top',
+                }}
+              />
+            )}
+
+            {/* Current Scrubbed Cursor Vertical Line */}
             <ReferenceLine
               yAxisId="level"
-              x={effective.hourOffset}
+              x={effective.simTimeSec}
               stroke="#f8fafc"
               strokeWidth={1.5}
             />

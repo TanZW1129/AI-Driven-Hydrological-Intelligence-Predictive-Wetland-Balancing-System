@@ -215,7 +215,7 @@ export function SluiceGateMesh({
         zIndexRange={[10, 0]}
       >
         <div
-          className={`pointer-events-none select-none rounded-lg border px-2.5 py-1 text-center font-mono text-[11px] shadow-xl backdrop-blur ${
+          className={`pointer-events-none select-none whitespace-nowrap rounded-lg border px-2.5 py-1 text-center font-mono text-[11px] shadow-xl backdrop-blur ${
             !canDischarge || phase === 'INTERLOCK_SUSPENDED'
               ? 'border-red-500/80 bg-red-950/90 text-red-200'
               : 'border-slate-600/80 bg-slate-950/90 text-slate-100'

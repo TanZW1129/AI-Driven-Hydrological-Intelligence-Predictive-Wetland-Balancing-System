@@ -15,6 +15,8 @@ import {
   CUSTOM_URL_TIMEOUT_MS,
   DEFAULT_INITIAL_SOIL_SATURATION,
   DEFAULT_SIMULATION_HORIZON_HOURS,
+  LIVE_FORECAST_HOURS,
+  LIVE_LOOKBACK_HOURS,
   LIVE_WEATHER_CACHE_TTL_MS,
 } from '../../constants/weatherConstants';
 import { fetchJsonWithTimeout, type FetchImplementation } from '../http/fetchWithTimeout';
@@ -28,6 +30,7 @@ import {
   composeParametricScenario,
   deriveSoilSaturationSeries,
   describeRainfall,
+  floorToHour,
   normaliseCustomScenario,
 } from './scenarioBuilder';
 import {
@@ -155,6 +158,138 @@ export async function loadLiveWeather(
         ],
       },
     };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Live real-time operation window (hindcast + NOW + forecast)
+// ---------------------------------------------------------------------------
+
+const MS_PER_HOUR = 3_600_000;
+
+export interface LoadLiveOperationalOptions {
+  nowMs?: number;
+  lookbackHours?: number;
+  forecastHours?: number;
+  fetchImpl?: FetchImplementation;
+  /** When true (default), serves an offline clear-day baseline if Open-Meteo fails. */
+  allowFallback?: boolean;
+}
+
+/**
+ * Build an offline clear-day baseline covering the requested real-time window.
+ * Used when Open-Meteo is unreachable so the live twin keeps operating safely.
+ */
+export function buildOfflineLiveBaseline(
+  windowStartMs: number,
+  totalHours: number,
+  nowMs: number,
+  reason: string,
+): WeatherScenarioPayload {
+  const validated = validateParametricScenario({
+    horizonHours: totalHours,
+    startTimeIso: new Date(windowStartMs).toISOString(),
+    initialSoilSaturation: DEFAULT_INITIAL_SOIL_SATURATION,
+  });
+  const baseline = composeParametricScenario(validated, {
+    sourceType: 'LIVE_API',
+    provider: 'open-meteo-fallback',
+    nowMs,
+    defaultScenarioId: 'LIVE_OPERATION_FALLBACK',
+    defaultScenarioName: 'BBR 实时运营 (离线安全基线)',
+  });
+  return {
+    ...baseline,
+    metadata: {
+      ...baseline.metadata,
+      isFallback: true,
+      warnings: [reason],
+    },
+  };
+}
+
+/**
+ * Load the real-time operational window for live mode: `lookbackHours` of
+ * observed/assimilated Open-Meteo hours before the current wall-clock hour,
+ * followed by `forecastHours` of forecast. The series starts on an exact hour
+ * boundary so that frame indices map deterministically to wall-clock time.
+ */
+export async function loadLiveOperationalWeather(
+  options: LoadLiveOperationalOptions = {},
+): Promise<WeatherScenarioPayload> {
+  const nowMs = options.nowMs ?? Date.now();
+  const lookbackHours = options.lookbackHours ?? LIVE_LOOKBACK_HOURS;
+  const forecastHours = options.forecastHours ?? LIVE_FORECAST_HOURS;
+  const totalHours = lookbackHours + forecastHours;
+  const windowStartMs = floorToHour(nowMs) - lookbackHours * MS_PER_HOUR;
+  const allowFallback = options.allowFallback ?? true;
+
+  try {
+    const raw = await fetchOpenMeteoForecast({
+      ...(lookbackHours > 0 ? { pastDays: Math.ceil(lookbackHours / 24) } : {}),
+      ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+    });
+    const parsed = parseOpenMeteoResponse(raw, { nowMs: windowStartMs, horizonHours: totalHours });
+
+    if (parsed.startMs !== windowStartMs) {
+      throw new Error(
+        `Open-Meteo window misaligned (expected ${new Date(windowStartMs).toISOString()}, received ${new Date(parsed.startMs).toISOString()}).`,
+      );
+    }
+    if (parsed.hours.length < lookbackHours + 1) {
+      throw new Error(`Open-Meteo returned only ${parsed.hours.length} hour(s); the NOW hour is not covered.`);
+    }
+
+    const rainfall = parsed.hours.map((h) => h.precipitationMmPerHr);
+    const suppliedSoil = parsed.hours.map((h) => h.soilSaturation);
+    const firstSoil = suppliedSoil.find((s): s is number => s !== undefined) ?? DEFAULT_INITIAL_SOIL_SATURATION;
+    const soilSeries = deriveSoilSaturationSeries(rainfall, firstSoil, suppliedSoil);
+    const tideSeries = generateTidalSeries(createNormalTideProfile(parsed.startMs), parsed.hours.length);
+
+    const derivedFields: DerivedField[] = ['downstreamLevelM'];
+    if (suppliedSoil.some((s) => s === undefined)) {
+      derivedFields.push('soilSaturation');
+    }
+
+    const hourlySeries: HourlyWeatherPoint[] = parsed.hours.map((hour, index) => ({
+      timeIso: new Date(hour.timeMs).toISOString(),
+      hourOffset: index,
+      precipitationMmPerHr: hour.precipitationMmPerHr,
+      soilSaturation: soilSeries[index] ?? firstSoil,
+      downstreamLevelM: tideSeries[index] ?? 0,
+      ...(hour.temperatureC !== undefined ? { temperatureC: hour.temperatureC } : {}),
+      ...(hour.precipitationProbabilityPct !== undefined
+        ? { precipitationProbabilityPct: hour.precipitationProbabilityPct }
+        : {}),
+      weatherDescription: hour.weatherDescription ?? describeRainfall(hour.precipitationMmPerHr),
+    }));
+
+    return {
+      scenarioId: 'LIVE_OPERATION',
+      scenarioName: 'BBR 实时运营 (Open-Meteo)',
+      description: `Real-time window: ${lookbackHours} h hindcast + ${forecastHours} h forecast from Open-Meteo, coupled with Klang Strait synthetic tide.`,
+      sourceType: 'LIVE_API',
+      createdAt: new Date(nowMs).toISOString(),
+      hourlySeries,
+      metadata: {
+        provider: 'open-meteo',
+        latitude: parsed.latitude,
+        longitude: parsed.longitude,
+        isFallback: false,
+        warnings: parsed.warnings,
+        derivedFields,
+      },
+    };
+  } catch (error) {
+    if (!allowFallback) {
+      throw error;
+    }
+    return buildOfflineLiveBaseline(
+      windowStartMs,
+      totalHours,
+      nowMs,
+      `Open-Meteo unreachable (${(error as Error).message}). Serving offline clear-day baseline.`,
+    );
   }
 }
 

@@ -140,7 +140,7 @@ export function DownstreamBasinMesh({
         zIndexRange={[10, 0]}
       >
         <div
-          className={`pointer-events-none select-none rounded-lg border px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur ${
+          className={`pointer-events-none select-none whitespace-nowrap rounded-lg border px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur ${
             isCritical || isTidalLock
               ? 'border-amber-500/80 bg-amber-950/90 text-amber-200'
               : 'border-slate-700 bg-slate-950/90 text-slate-200'

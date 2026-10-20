@@ -29,7 +29,7 @@ const THRESHOLD_RINGS: ReadonlyArray<{
 
 export function LevelGaugeMarker({
   currentLevelM,
-  position = [-1.2, 0, -4.5],
+  position = [-4.2, 0, -4.2],
 }: LevelGaugeMarkerProps) {
   const towerHeight = 4.2 * SCENE_Y_PER_METRE;
   const currentY = levelToSceneY(currentLevelM);
@@ -88,7 +88,7 @@ export function LevelGaugeMarker({
         distanceFactor={22}
         zIndexRange={[10, 0]}
       >
-        <div className="pointer-events-none select-none rounded-lg border border-cyan-500/50 bg-slate-950/90 px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur">
+        <div className="pointer-events-none select-none whitespace-nowrap rounded-lg border border-cyan-500/50 bg-slate-950/90 px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur">
           <div className="text-[9px] uppercase tracking-wider text-slate-400">
             湿地超声波液位计
           </div>

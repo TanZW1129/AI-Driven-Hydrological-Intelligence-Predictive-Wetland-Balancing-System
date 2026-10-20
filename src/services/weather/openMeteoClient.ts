@@ -78,6 +78,8 @@ export interface OpenMeteoRequestOptions {
   latitude?: number;
   longitude?: number;
   forecastDays?: number;
+  /** Number of past days to include (enables real-time hindcast windows). */
+  pastDays?: number;
   timeoutMs?: number;
   maxRetries?: number;
   fetchImpl?: FetchImplementation;
@@ -92,6 +94,9 @@ export function buildOpenMeteoUrl(options: OpenMeteoRequestOptions = {}): string
     timeformat: 'unixtime',
     forecast_days: String(options.forecastDays ?? OPEN_METEO_FORECAST_DAYS),
   });
+  if (options.pastDays !== undefined && options.pastDays > 0) {
+    params.set('past_days', String(options.pastDays));
+  }
   return `${OPEN_METEO_FORECAST_ENDPOINT}?${params.toString()}`;
 }
 

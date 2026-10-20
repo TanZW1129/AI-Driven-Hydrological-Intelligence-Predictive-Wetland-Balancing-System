@@ -36,6 +36,25 @@ export const LIVE_WEATHER_CACHE_TTL_MS = 15 * 60 * 1_000;
 export const CUSTOM_URL_TIMEOUT_MS = 8_000;
 
 // ---------------------------------------------------------------------------
+// Live real-time operation window
+// ---------------------------------------------------------------------------
+
+/** Hours of model hindcast shown before "NOW" in live operation mode. */
+export const LIVE_LOOKBACK_HOURS = 6;
+
+/** Hours of forecast-driven projection shown after "NOW" in live operation mode. */
+export const LIVE_FORECAST_HOURS = 24;
+
+/** Interval between automatic Open-Meteo re-synchronisations in live mode (ms). */
+export const LIVE_REFRESH_INTERVAL_MS = 15 * 60 * 1_000;
+
+/** Interval at which the live "NOW" cursor is advanced against the wall clock (ms). */
+export const LIVE_CLOCK_TICK_MS = 15 * 1_000;
+
+/** Display timezone for the Klang operations centre (UTC+8). */
+export const DISPLAY_TIMEZONE = 'Asia/Kuala_Lumpur';
+
+// ---------------------------------------------------------------------------
 // Scenario horizon & validation bounds
 // ---------------------------------------------------------------------------
 

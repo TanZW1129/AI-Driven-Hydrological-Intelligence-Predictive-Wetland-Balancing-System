@@ -9,3 +9,12 @@ dist
 # Local plans and implementation drafts (not uploaded to GitHub)
 plans/
 *plan*.md
+
+# Temporary and local inspection scripts
+scripts/inspect-web.mjs
+*.png
+*.jpg
+*.jpeg
+*.webm
+temp/
+scratch/

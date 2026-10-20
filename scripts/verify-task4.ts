@@ -1,8 +1,12 @@
 /**
  * @file verify-task4.ts
- * @description Checkpoint 4 automated verification suite for the Digital Twin
- * Dashboard store, 3D scene coordinate mapping, Swagger injection integration
- * and interactive downstream safety interlock override.
+ * @description Checkpoint 4 & Redesign automated verification suite for:
+ *   - Dual-Mode decoupling (LIVE Real-Time Operation vs. SIMULATION API Studio)
+ *   - Real-time wall-clock anchoring (NOW), 30h window (-6h hindcast + 24h forecast)
+ *     and future-hour lookahead scrubbing (+6h)
+ *   - 3D scene coordinate mapping & camera presets
+ *   - Custom parametric form synthesis & Swagger JSON injection
+ *   - Interactive downstream safety interlock emergency halt & hysteresis release
  */
 
 import {
@@ -12,6 +16,8 @@ import {
 import { SAMPLE_CUSTOM_SWAGGER_PAYLOAD } from '../src/services/weather/openApiSpec';
 import {
   selectEffectiveFrame,
+  selectTimeContext,
+  TIMELINE_FRAMES_PER_HOUR,
   useSimulationStore,
 } from '../src/store/simulationStore';
 
@@ -33,11 +39,54 @@ function expectEqual<T>(name: string, actual: T, expected: T): void {
   record(name, actual === expected, `actual=${String(actual)} | expected=${String(expected)}`);
 }
 
-console.log('\n\x1b[1m\x1b[36m▶ Checkpoint 4 · Store, 3D Coordinates & Interactive Safety Interlock\x1b[0m');
+console.log('\n\x1b[1m\x1b[36m▶ Checkpoint 4 · Dual-Mode Store, Real-Time Lookahead, 3D & Safety Interlock\x1b[0m');
 
-// 1. Verify initial store state
+// ---------------------------------------------------------------------------
+// Part A: LIVE Real-Time Operational Mode
+// ---------------------------------------------------------------------------
+const initialStore = useSimulationStore.getState();
+expectEqual('Default boot mode = LIVE (Real-Time Operation)', initialStore.appMode, 'LIVE');
+expectEqual('LIVE mode locked to NOW by default (followNow = true)', initialStore.live.followNow, true);
+expectEqual(
+  'LIVE cursor frame aligned with nowFrameIndex',
+  initialStore.currentFrameIndex,
+  initialStore.live.nowFrameIndex,
+);
+record(
+  'LIVE 30h operational window loaded (360 frames @ 5-min step)',
+  initialStore.frames.length === 360,
+  `frames=${initialStore.frames.length}`,
+);
+
+// Scrub +6 hours into the future in LIVE mode
+initialStore.stepBy(6 * TIMELINE_FRAMES_PER_HOUR);
+const lookaheadState = useSimulationStore.getState();
+const lookaheadTimeCtx = selectTimeContext(lookaheadState);
+expectEqual('Scrubbing +6h in LIVE mode unlocks followNow', lookaheadState.live.followNow, false);
+expectEqual('Scrubbing +6h marks timeContext.isForecast = true', lookaheadTimeCtx.isForecast, true);
+record(
+  'Lookahead offsetFromNowSec > +5h (18,000s)',
+  lookaheadTimeCtx.offsetFromNowSec > 18_000,
+  `offsetFromNowSec=${lookaheadTimeCtx.offsetFromNowSec}s`,
+);
+
+// Jump back to NOW
+lookaheadState.jumpToNow();
+const snappedState = useSimulationStore.getState();
+expectEqual('jumpToNow() restores followNow = true', snappedState.live.followNow, true);
+expectEqual(
+  'jumpToNow() snaps cursor back to nowFrameIndex',
+  snappedState.currentFrameIndex,
+  snappedState.live.nowFrameIndex,
+);
+
+// ---------------------------------------------------------------------------
+// Part B: Custom SIMULATION Studio Mode & 3D Coordinates
+// ---------------------------------------------------------------------------
+useSimulationStore.getState().setAppMode('SIMULATION');
 const store = useSimulationStore.getState();
-expectEqual('Initial scenario = SCENARIO_PRE_STORM', store.activeScenario.scenarioId, 'SCENARIO_PRE_STORM');
+expectEqual('Switched to SIMULATION studio mode', store.appMode, 'SIMULATION');
+expectEqual('Default custom scenario = CUSTOM_SIMULATION', store.activeScenario.scenarioId, 'CUSTOM_SIMULATION');
 record('Pre-computed 24h frames loaded (288 frames @ 5-min step)', store.frames.length >= 280, `frames=${store.frames.length}`);
 
 // 2. Verify 3D coordinate mapping
@@ -90,11 +139,22 @@ expectEqual(
   'CUSTOM_MONSOON_BURST',
 );
 
-// Restore default scenario
-store.selectPresetScenario('SCENARIO_PRE_STORM');
+// 9. Verify custom parametric form update & re-synthesis
+store.updateSimulationForm({ peakIntensityMmPerHr: 110, stormStartHour: 3 });
+store.applySimulationForm();
+expectEqual(
+  'Custom parametric form re-synthesizes scenario (peak rain = 110 mm/h at T+3h)',
+  useSimulationStore.getState().activeScenario.hourlySeries[3]?.precipitationMmPerHr,
+  110,
+);
+
+// Restore default state
+store.resetSimulationForm();
+store.applySimulationForm();
+store.setAppMode('LIVE');
 
 const passed = results.filter((r) => r.passed).length;
 const failed = results.length - passed;
 console.log(`\n  Passed: ${passed}/${results.length}`);
 if (failed > 0) process.exit(1);
-console.log('  \x1b[32m\x1b[1m✔ ALL CHECKPOINT 4 ASSERTIONS PASSED\x1b[0m\n');
+console.log('  \x1b[32m\x1b[1m✔ ALL CHECKPOINT 4 & REDESIGN ASSERTIONS PASSED\x1b[0m\n');
