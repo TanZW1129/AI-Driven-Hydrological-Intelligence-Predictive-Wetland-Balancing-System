@@ -51,47 +51,69 @@ Every simulation run computes two isolated hydrological tracks side-by-side unde
 
 ## 3. Enterprise System Architecture
 
+The platform follows a strict **4-tier decoupled architecture** where external meteorological and tidal inputs pass through fail-safe schema validation before driving the deterministic physics kernel, safety interlock guard, and 60 FPS WebGL Digital Twin.
+
 ```mermaid
-flowchart TD
-    subgraph Layer1["1. Physical & External Data Sources"]
-        Sensors["Virtual IoT Telemetry Suite<br/>(Ultrasonic Level / TDR Soil Moisture / Gate Encoders)"]
-        OpenMeteo["Open-Meteo Weather API<br/>(Hourly Precipitation & Soil Moisture Forecast)"]
-        SwaggerInput["Swagger / OpenAPI 3.0.3 Console<br/>(Raw JSON / Parametric Storm & Tide Synthesizer)"]
+flowchart TB
+    subgraph T1["Tier 1 · External Weather, Tidal & Telemetry Sources"]
+        direction LR
+        OpenMeteo(["Open-Meteo API (UTC+8)"])
+        SwaggerUI(["Swagger / OpenAPI 3.0 Console"])
+        IoTSensors(["Virtual IoT Sensor Suite"])
     end
 
-    subgraph Layer2["2. Ingestion, Validation & Boundary Services"]
-        Validator["Zod Fail-Safe Schema Validator<br/>(scenarioValidator.ts)"]
-        WeatherAdapter["Weather & Horizon Adapter<br/>(weatherAdapter.ts)"]
-        TidalEngine["Klang Strait Tidal & Storm Surge Model<br/>(tidalSimulator.ts)"]
+    subgraph T2["Tier 2 · Validation, Adaptation & Boundary Modeling"]
+        direction LR
+        ZodValidator["Zod Fail-Safe Validator"]
+        WeatherAdapter["Weather & Horizon Adapter"]
+        TidalModel["Klang M2 Tidal & Surge Model"]
     end
 
-    subgraph Layer3["3. Core Hydrological & Autonomous Control Engine"]
-        Hydrology["Hydrology & Mass-Balance Engine<br/>(Soil-Compensated Rational Method & Orifice Flow)"]
-        Interlock["Full-Lifecycle Safety Interlock Guard<br/>(3-Point Check + Hysteresis Deadband)"]
-        StateMachine["4-Phase Autonomous State Machine<br/>(Normal -> Pre-Discharge -> Peak-Shaving -> Recovery)"]
-        DualTrack["Dual-Track Parallel Simulator<br/>(Smart Gate Track vs. Traditional Static Weir Track)"]
+    subgraph T3["Tier 3 · Core Physics, Safety Interlock & AI State Machine"]
+        direction LR
+        HydroEngine["Rational Inflow & Orifice Engine"]
+        SafetyGuard{{"3-Point Downstream Interlock"}}
+        StateMachine["4-Phase AI Control State Machine"]
     end
 
-    subgraph Layer4["4. Reactive State & 3D Digital Twin Presentation"]
-        Store["Zustand Central Store<br/>(Live / Simulation Mode Decoupling)"]
-        ThreeViewport["Three.js / R3F 3D Wetland Digital Twin<br/>(Multi-Lagoon Extrusion & Overland Flood Layer)"]
-        CommandDeck["Command Center Deck & Recharts Hydrograph<br/>(KPIs / Interlock Stress Testbench / 24h Curves)"]
+    subgraph T4["Tier 4 · Dual-Track Simulation & 3D Digital Twin"]
+        direction LR
+        DualSim["Dual-Track Parallel Simulator"]
+        ZustandStore[("Zustand Reactive Store")]
+        TwinUI["Three.js 3D Twin & Recharts Deck"]
     end
 
-    Sensors --> Hydrology
-    OpenMeteo --> WeatherAdapter
-    SwaggerInput --> Validator
-    Validator --> WeatherAdapter
-    TidalEngine --> Interlock
+    %% Tier 1 -> Tier 2
+    SwaggerUI -->|Raw JSON / Params| ZodValidator
+    OpenMeteo -->|6h Hindcast + 24h Forecast| WeatherAdapter
+    IoTSensors -->|Ultrasonic & TDR Telemetry| TidalModel
+    ZodValidator -->|Validated Payload| WeatherAdapter
 
-    WeatherAdapter --> DualTrack
-    Hydrology --> Interlock
-    Interlock --> StateMachine
-    StateMachine --> DualTrack
-    DualTrack --> Store
+    %% Tier 2 -> Tier 3
+    WeatherAdapter -->|Rain Intensity & Soil Series| HydroEngine
+    TidalModel -->|Downstream Level H_down| SafetyGuard
 
-    Store --> ThreeViewport
-    Store --> CommandDeck
+    %% Tier 3 Internal Closed Loop
+    HydroEngine -->|Q_in, Q_out & Buffer V_avail| SafetyGuard
+    SafetyGuard -->|PERMITTED / LATCHED Lockout| StateMachine
+
+    %% Tier 3 -> Tier 4
+    StateMachine -->|Guarded Gate Opening O_gate| DualSim
+    DualSim -->|Smart vs. Baseline Time-Series| ZustandStore
+    ZustandStore -->|Real-Time & Scrubbed Frames| TwinUI
+
+    %% Enterprise Color Styling
+    classDef sourceNode fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#ffffff,font-weight:bold
+    classDef adapterNode fill:#0f766e,stroke:#2dd4bf,stroke-width:2px,color:#ffffff,font-weight:bold
+    classDef coreNode fill:#4338ca,stroke:#818cf8,stroke-width:2px,color:#ffffff,font-weight:bold
+    classDef guardNode fill:#b45309,stroke:#fbbf24,stroke-width:2px,color:#ffffff,font-weight:bold
+    classDef viewNode fill:#6d28d9,stroke:#c084fc,stroke-width:2px,color:#ffffff,font-weight:bold
+
+    class OpenMeteo,SwaggerUI,IoTSensors sourceNode
+    class ZodValidator,WeatherAdapter,TidalModel adapterNode
+    class HydroEngine,StateMachine coreNode
+    class SafetyGuard guardNode
+    class DualSim,ZustandStore,TwinUI viewNode
 ```
 
 ---
@@ -267,6 +289,6 @@ npx tsx scripts/verify-task4.ts
 | $O_{\text{max}}$ | Maximum Vertical Sluice Gate Opening | $2.00$ | $\text{m}$ |
 | $C_d$ | Sluice Gate Orifice Discharge Coefficient | $0.62$ | dimensionless |
 | $C_w$ | Traditional Unmanaged Weir Coefficient | $1.84$ | $\text{m}^{1/2}/\text{s}$ |
-| $H_{\text{down\_crit}}$ | Downstream Klang River Critical Lockout Level | $2.50$ | $\text{m}$ |
+| $H_{\text{down,crit}}$ | Downstream Klang River Critical Lockout Level | $2.50$ | $\text{m}$ |
 | $\delta_{\text{down}}$ | Downstream Lockout Hysteresis Release Margin | $0.15$ (Unlocks $\le 2.35$) | $\text{m}$ |
 | $\Delta H_{\text{min}}$ | Minimum Safe Positive Head Differential | $0.10$ (Unlocks $\ge 0.15$) | $\text{m}$ |
