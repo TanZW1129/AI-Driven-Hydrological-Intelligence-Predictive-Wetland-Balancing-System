@@ -125,7 +125,7 @@ export function SimulationPlayerBar() {
             }`}
           >
             <Radio className="h-3.5 w-3.5 animate-pulse" />
-            {state.live.followNow ? '实时锁定 NOW' : '↺ 回到当前 NOW'}
+            {state.live.followNow ? 'Locked to NOW' : '↺ Jump to NOW'}
           </button>
 
           <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950 p-0.5 font-mono text-[11px]">
@@ -140,7 +140,7 @@ export function SimulationPlayerBar() {
                 key={btn.label}
                 type="button"
                 onClick={() => state.stepBy(btn.delta)}
-                title={`向${btn.delta > 0 ? '未来推演' : '历史回看'}跳转 ${btn.label}`}
+                title={`Jump ${btn.label} (${btn.delta > 0 ? 'Forecast' : 'Hindcast'})`}
                 className="rounded px-2 py-1 text-slate-300 transition hover:bg-slate-800 hover:text-cyan-300"
               >
                 {btn.label}
@@ -153,7 +153,7 @@ export function SimulationPlayerBar() {
           <button
             type="button"
             onClick={state.resetPlayback}
-            title="重置仿真到 00:00"
+            title="Reset Simulation to 00:00"
             className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 transition hover:bg-slate-700 hover:text-white"
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -162,7 +162,7 @@ export function SimulationPlayerBar() {
           <button
             type="button"
             onClick={state.stepBackward}
-            title="后退一步 (-5 min)"
+            title="Step Backward (-5 min)"
             className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 transition hover:bg-slate-700 hover:text-white"
           >
             <SkipBack className="h-3.5 w-3.5" />
@@ -179,11 +179,11 @@ export function SimulationPlayerBar() {
           >
             {state.isPlaying ? (
               <>
-                <Pause className="h-3.5 w-3.5" /> 暂停推演
+                <Pause className="h-3.5 w-3.5" /> Pause
               </>
             ) : (
               <>
-                <Play className="h-3.5 w-3.5" /> 播放推演
+                <Play className="h-3.5 w-3.5" /> Play
               </>
             )}
           </button>
@@ -191,7 +191,7 @@ export function SimulationPlayerBar() {
           <button
             type="button"
             onClick={state.stepForward}
-            title="前进一步 (+5 min)"
+            title="Step Forward (+5 min)"
             className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 transition hover:bg-slate-700 hover:text-white"
           >
             <SkipForward className="h-3.5 w-3.5" />
@@ -240,7 +240,7 @@ export function SimulationPlayerBar() {
               <div
                 key={idx}
                 className={`h-full flex-1 ${PHASE_STRIP_COLOR[f.smart.phase]}`}
-                title={`T+${f.hourOffset}h · ${f.smart.phase} · 雨强 ${f.rainfallIntensityMmPerHr} mm/h`}
+                title={`T+${f.hourOffset}h · ${f.smart.phase} · Rain ${f.rainfallIntensityMmPerHr} mm/h`}
               />
             ))}
           </div>
@@ -307,15 +307,15 @@ export function SimulationPlayerBar() {
             }`}
           >
             {state.live.status === 'ONLINE'
-              ? 'Open-Meteo 实时在线 (-6h ~ +24h)'
+              ? 'Open-Meteo Live Online (-6h ~ +24h)'
               : state.live.status === 'SYNCING'
-                ? '正在同步气象预报...'
-                : '离线安全基线'}
+                ? 'Syncing Forecast Data...'
+                : 'Offline Safe Baseline'}
           </span>
           <button
             type="button"
             onClick={() => void state.refreshLiveData()}
-            title="立即刷新 Open-Meteo 实时天气与潮汐推演"
+            title="Refresh Open-Meteo Forecast & Tidal Model"
             className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 transition hover:bg-slate-700 hover:text-white"
           >
             <RefreshCw
@@ -328,7 +328,7 @@ export function SimulationPlayerBar() {
       ) : (
         <div className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-950 p-1 font-mono text-xs">
           <FastForward className="ml-1.5 h-3.5 w-3.5 text-slate-400" />
-          <span className="mr-1 text-[10px] text-slate-400">倍速:</span>
+          <span className="mr-1 text-[10px] text-slate-400">Speed:</span>
           {SPEED_OPTIONS.map((spd) => (
             <button
               key={spd}

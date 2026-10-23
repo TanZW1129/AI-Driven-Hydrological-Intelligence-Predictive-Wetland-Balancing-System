@@ -196,7 +196,7 @@ export function buildOfflineLiveBaseline(
     provider: 'open-meteo-fallback',
     nowMs,
     defaultScenarioId: 'LIVE_OPERATION_FALLBACK',
-    defaultScenarioName: 'BBR 实时运营 (离线安全基线)',
+    defaultScenarioName: 'BBR Real-Time (Safe Baseline)',
   });
   return {
     ...baseline,
@@ -266,7 +266,7 @@ export async function loadLiveOperationalWeather(
 
     return {
       scenarioId: 'LIVE_OPERATION',
-      scenarioName: 'BBR 实时运营 (Open-Meteo)',
+      scenarioName: 'BBR Real-Time (Open-Meteo Live)',
       description: `Real-time window: ${lookbackHours} h hindcast + ${forecastHours} h forecast from Open-Meteo, coupled with Klang Strait synthetic tide.`,
       sourceType: 'LIVE_API',
       createdAt: new Date(nowMs).toISOString(),

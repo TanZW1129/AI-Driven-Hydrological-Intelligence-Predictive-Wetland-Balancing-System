@@ -55,15 +55,15 @@ export default function App() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold tracking-tight text-white sm:text-base">
-                Bandar Bukit Raja (BBR) 智慧防洪与湿地数字孪生管控中心
+                Bandar Bukit Raja (BBR) Smart Flood Mitigation & Wetland Digital Twin
               </h1>
               <span className="hidden rounded-full border border-cyan-700/70 bg-cyan-950/80 px-2 py-0.5 font-mono text-[10px] text-cyan-300 sm:inline-block">
                 125-Acre Digital Twin
               </span>
             </div>
             <p className="font-mono text-[10px] text-slate-400">
-              坐标: {BBR_LATITUDE}°N, {BBR_LONGITUDE}°E (巴生 Klang) · 面积:{' '}
-              {Math.round(WETLAND_AREA_M2).toLocaleString()} m² · 当前源:{' '}
+              Coordinates: {BBR_LATITUDE}°N, {BBR_LONGITUDE}°E (Klang) · Area:{' '}
+              {Math.round(WETLAND_AREA_M2).toLocaleString()} m² · Active Source:{' '}
               <span className="text-cyan-300">{activeScenario.scenarioName}</span>
             </p>
           </div>
@@ -85,7 +85,7 @@ export default function App() {
                 appMode === 'LIVE' ? 'animate-pulse text-emerald-200' : ''
               }`}
             />
-            真实运营模式 (Live Real-Time)
+            Live Operation (Real-Time)
           </button>
 
           <button
@@ -98,7 +98,7 @@ export default function App() {
             }`}
           >
             <Sliders className="h-3.5 w-3.5" />
-            自定义模拟模式 (API Studio)
+            Custom Simulation (API Studio)
           </button>
         </div>
 
@@ -119,7 +119,7 @@ export default function App() {
             className="flex items-center gap-1.5 rounded-xl border border-purple-500/60 bg-purple-950/75 px-3 py-1.5 text-xs font-bold text-purple-200 shadow-lg transition hover:bg-purple-900/80"
           >
             <Terminal className="h-3.5 w-3.5" />
-            Swagger / API 数据注入
+            Swagger / API Injection
           </button>
         </div>
       </header>

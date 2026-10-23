@@ -45,27 +45,27 @@ const PHASE_BADGE: Readonly<
   Record<ControlPhase, { label: string; badgeClass: string; dotClass: string }>
 > = {
   NORMAL: {
-    label: 'PHASE 0 · 常态生态维持 (2.0m)',
+    label: 'PHASE 0 · Baseline Retention (2.0m)',
     badgeClass: 'border-emerald-500/50 bg-emerald-950/70 text-emerald-300',
     dotClass: 'bg-emerald-400',
   },
   PRE_DISCHARGE: {
-    label: 'PHASE 1 · 预测性主动预泄腾库 (→1.0m)',
+    label: 'PHASE 1 · Predictive Pre-Discharge (→1.0m)',
     badgeClass: 'border-blue-500/60 bg-blue-950/70 text-blue-300',
     dotClass: 'bg-blue-400 animate-ping',
   },
   PEAK_SHAVING: {
-    label: 'PHASE 2 · 暴雨错峰蓄洪 (关闸拦蓄)',
+    label: 'PHASE 2 · Peak Shaving (Gates Closed)',
     badgeClass: 'border-amber-500/60 bg-amber-950/70 text-amber-300',
     dotClass: 'bg-amber-400 animate-pulse',
   },
   RECOVERY: {
-    label: 'PHASE 3 · 洪后受控排涝恢复 (→2.0m)',
+    label: 'PHASE 3 · Controlled Drainage Recovery (→2.0m)',
     badgeClass: 'border-purple-500/60 bg-purple-950/70 text-purple-300',
     dotClass: 'bg-purple-400',
   },
   INTERLOCK_SUSPENDED: {
-    label: 'EMERGENCY HALT · 下游联锁熔断禁排 (0m)',
+    label: 'EMERGENCY HALT · Interlock Tripped (0m)',
     badgeClass: 'border-red-500/80 bg-red-950/85 text-red-200 animate-pulse',
     dotClass: 'bg-red-500 animate-ping',
   },
@@ -115,7 +115,7 @@ export function CentralCommandDeck() {
                   : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
             >
-              <Activity className="h-3.5 w-3.5" /> 实时遥测 &amp; KPI
+              <Activity className="h-3.5 w-3.5" /> Live Telemetry &amp; KPIs
             </button>
 
             <button
@@ -132,7 +132,7 @@ export function CentralCommandDeck() {
               ) : (
                 <ShieldAlert className="h-3.5 w-3.5 text-red-400 animate-bounce" />
               )}
-              安全联锁验证
+              Safety Interlock Guard
             </button>
 
             <button
@@ -149,7 +149,7 @@ export function CentralCommandDeck() {
                   : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
             >
-              <Sliders className="h-3.5 w-3.5" /> 自定义数据模拟
+              <Sliders className="h-3.5 w-3.5" /> Custom Studio
             </button>
           </div>
 
@@ -171,9 +171,9 @@ export function CentralCommandDeck() {
                 {/* Tile 1: Wetland Level & Storage */}
                 <div className="rounded-lg border border-slate-800 bg-slate-950/75 p-2.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span>125英亩湿地水位</span>
+                    <span>125-Acre Wetland Level</span>
                     <span className="font-mono text-sky-400">
-                      蓄满 {capacityPct.toFixed(0)}%
+                      Filled {capacityPct.toFixed(0)}%
                     </span>
                   </div>
                   <div className="mt-1 flex items-baseline justify-between font-mono">
@@ -184,34 +184,34 @@ export function CentralCommandDeck() {
                       <span className="ml-0.5 text-xs text-slate-400">m</span>
                     </div>
                     <span className="text-[11px] text-orange-300">
-                      传统: {effective.traditionalLevelM.toFixed(2)}m
+                      Baseline: {effective.traditionalLevelM.toFixed(2)}m
                     </span>
                   </div>
                   <div className="mt-1 font-mono text-[10px] text-slate-400">
-                    可用缓冲: {effective.availableBufferM3.toLocaleString()} m³
+                    Buffer Avail: {effective.availableBufferM3.toLocaleString()} m³
                   </div>
                 </div>
 
                 {/* Tile 2: Inflow / Outflow & Gate */}
                 <div className="rounded-lg border border-slate-800 bg-slate-950/75 p-2.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span>进出流量 &amp; 排洪闸</span>
+                    <span>Flow Balance &amp; Gates</span>
                     <span className="font-mono text-cyan-300">
-                      开度 {effective.gateOpeningM.toFixed(2)}m ({gateOpenPct}%)
+                      Opening {effective.gateOpeningM.toFixed(2)}m ({gateOpenPct}%)
                     </span>
                   </div>
                   <div className="mt-1 flex items-center justify-between font-mono text-xs">
                     <span className="flex items-center gap-0.5 text-sky-300">
-                      <ArrowDownRight className="h-3.5 w-3.5" />入:{' '}
+                      <ArrowDownRight className="h-3.5 w-3.5" />In:{' '}
                       <strong>{effective.inflowM3PerS.toFixed(1)}</strong> m³/s
                     </span>
                     <span className="flex items-center gap-0.5 text-emerald-300">
-                      <ArrowUpRight className="h-3.5 w-3.5" />出:{' '}
+                      <ArrowUpRight className="h-3.5 w-3.5" />Out:{' '}
                       <strong>{effective.outflowM3PerS.toFixed(1)}</strong> m³/s
                     </span>
                   </div>
                   <div className="mt-1 font-mono text-[10px] text-slate-400">
-                    当前雨强: {effective.rainfallIntensityMmPerHr} mm/h · 土壤湿度:{' '}
+                    Rain Rate: {effective.rainfallIntensityMmPerHr} mm/h · Soil Sat:{' '}
                     {(effective.soilSaturation * 100).toFixed(0)}%
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export function CentralCommandDeck() {
                 {/* Tile 3: Downstream Tide & Interlock */}
                 <div className="rounded-lg border border-slate-800 bg-slate-950/75 p-2.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span>下游巴生潮位</span>
+                    <span>Downstream Klang Tide</span>
                     <span
                       className={`rounded px-1.5 py-0.2 font-mono text-[10px] font-bold ${
                         effective.canDischarge
@@ -227,7 +227,7 @@ export function CentralCommandDeck() {
                           : 'bg-red-950 text-red-300'
                       }`}
                     >
-                      {effective.canDischarge ? '✓ 允许外排' : '⛔ 闭锁禁排'}
+                      {effective.canDischarge ? '✓ Permitted' : '⛔ Interlocked'}
                     </span>
                   </div>
                   <div className="mt-1 flex items-baseline justify-between font-mono">
@@ -248,28 +248,28 @@ export function CentralCommandDeck() {
                     </span>
                   </div>
                   <div className="mt-1 truncate font-mono text-[10px] text-amber-300/90">
-                    状态码: {effective.interlockReasonCode}
+                    Status Code: {effective.interlockReasonCode}
                   </div>
                 </div>
 
                 {/* Tile 4: Dual-Track Mitigation Impact */}
                 <div className="rounded-lg border border-slate-800 bg-slate-950/75 p-2.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span>AI 智控减灾成效</span>
+                    <span>Smart Mitigation Impact</span>
                     <span className="font-mono text-emerald-400">
-                      削峰 {summary.mitigation.peakLevelReductionM.toFixed(2)}m
+                      Peak Cut {summary.mitigation.peakLevelReductionM.toFixed(2)}m
                     </span>
                   </div>
                   <div className="mt-1 flex items-baseline justify-between font-mono">
                     <span className="text-lg font-bold text-emerald-400">
                       +{summary.mitigation.avoidedOverflowVolumeM3.toLocaleString()}{' '}
                       <span className="text-[10px] font-normal text-slate-400">
-                        m³ 免溢流
+                        m³ Overflow Avoided
                       </span>
                     </span>
                   </div>
                   <div className="mt-1 font-mono text-[10px] text-slate-400">
-                    传统峰值: {summary.traditional.peakWaterLevelM.toFixed(2)}m · AI峰值:{' '}
+                    Baseline Peak: {summary.traditional.peakWaterLevelM.toFixed(2)}m · Smart Peak:{' '}
                     {summary.smart.peakWaterLevelM.toFixed(2)}m
                   </div>
                 </div>
@@ -287,7 +287,7 @@ export function CentralCommandDeck() {
                   <span className="flex items-center gap-1 font-semibold text-cyan-400">
                     <Radio className="h-3 w-3 animate-pulse" /> {phaseInfo.label}
                   </span>
-                  <span>未来6h预计雨量: {effective.forecast6hRainMm} mm</span>
+                  <span>Forecast 6h Rain: {effective.forecast6hRainMm} mm</span>
                 </div>
                 <div className="line-clamp-2">{effective.decisionReason}</div>
               </div>
@@ -307,7 +307,7 @@ export function CentralCommandDeck() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>1. 正向水头差</span>
+                    <span>1. Head Differential</span>
                     {checkHeadOk ? (
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
                     ) : (
@@ -317,7 +317,7 @@ export function CentralCommandDeck() {
                   <div className="mt-0.5 text-xs font-bold">
                     ΔH = {headDiffM.toFixed(2)} m
                   </div>
-                  <div className="text-[9px] opacity-75">要求 ≥ +0.10 m</div>
+                  <div className="text-[9px] opacity-75">Req. ≥ +0.10 m</div>
                 </div>
 
                 <div
@@ -328,7 +328,7 @@ export function CentralCommandDeck() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>2. 下游承泄水位</span>
+                    <span>2. Downstream River</span>
                     {checkDownstreamOk ? (
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
                     ) : (
@@ -338,7 +338,7 @@ export function CentralCommandDeck() {
                   <div className="mt-0.5 text-xs font-bold">
                     H_down = {effective.downstreamLevelM.toFixed(2)} m
                   </div>
-                  <div className="text-[9px] opacity-75">临界 &lt; 2.50 m</div>
+                  <div className="text-[9px] opacity-75">Critical &lt; 2.50 m</div>
                 </div>
 
                 <div
@@ -349,7 +349,7 @@ export function CentralCommandDeck() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>3. 湿地生态底线</span>
+                    <span>3. Ecological Datum</span>
                     {checkEcologicalOk ? (
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
                     ) : (
@@ -359,7 +359,7 @@ export function CentralCommandDeck() {
                   <div className="mt-0.5 text-xs font-bold">
                     H_wet = {effective.wetlandLevelM.toFixed(2)} m
                   </div>
-                  <div className="text-[9px] opacity-75">要求 &gt; 1.00 m</div>
+                  <div className="text-[9px] opacity-75">Req. &gt; 1.00 m</div>
                 </div>
               </div>
 
@@ -367,7 +367,7 @@ export function CentralCommandDeck() {
               <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-950/80 p-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-[11px] font-semibold text-amber-300">
-                    排水中途下游水位突增 · 紧急熔断压力测试台
+                    Mid-Drain Downstream Surge · Emergency Trip Test Bench
                   </span>
                   <div className="flex items-center gap-1.5">
                     <button
@@ -381,7 +381,7 @@ export function CentralCommandDeck() {
                       }}
                       className="flex items-center gap-1 rounded bg-red-600/90 px-2 py-0.5 text-[10px] font-bold text-white hover:bg-red-500"
                     >
-                      <Zap className="h-3 w-3" /> 一键模拟排水中途涨潮 (2.65m)
+                      <Zap className="h-3 w-3" /> Inject Tidal Surge (2.65m)
                     </button>
                     {state.downstreamOverrideEnabled && (
                       <button
@@ -389,7 +389,7 @@ export function CentralCommandDeck() {
                         onClick={() => state.setDownstreamOverride(false)}
                         className="flex items-center gap-1 rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-700"
                       >
-                        <RotateCcw className="h-3 w-3" /> 恢复正常潮位
+                        <RotateCcw className="h-3 w-3" /> Reset Normal Tide
                       </button>
                     )}
                   </div>
@@ -399,7 +399,7 @@ export function CentralCommandDeck() {
                 <div className="space-y-0.5">
                   <div className="flex justify-between font-mono text-[10px]">
                     <span className="text-slate-400">
-                      下游巴生海峡水位注入 (≤2.35m 迟滞解锁 | ≥2.50m 瞬时熔断):
+                      Downstream Tide Level Injection (≤2.35m Unlock | ≥2.50m Trip):
                     </span>
                     <span className="font-bold text-amber-300">
                       {effective.downstreamLevelM.toFixed(2)} m
@@ -425,10 +425,10 @@ export function CentralCommandDeck() {
                 <div className="space-y-0.5">
                   <div className="flex justify-between font-mono text-[10px]">
                     <span className="text-slate-400">
-                      人工强制请求闸门开度 (受下游安全联锁保护):
+                      Manual Gate Target Request (Guarded by Interlock):
                     </span>
                     <span className="text-purple-300">
-                      请求 {effective.targetGateOpeningM.toFixed(2)}m → 实际执行{' '}
+                      Target {effective.targetGateOpeningM.toFixed(2)}m → Actual{' '}
                       <strong
                         className={
                           effective.gateOpeningM > 0
@@ -473,7 +473,7 @@ export function CentralCommandDeck() {
                     <Unlock className="h-3.5 w-3.5 text-emerald-400" />
                   )}
                   <span>
-                    联锁闭锁状态:{' '}
+                    Interlock Latch:{' '}
                     <strong
                       className={
                         effective.activeLockout ? 'text-red-400' : 'text-emerald-400'
@@ -481,12 +481,12 @@ export function CentralCommandDeck() {
                     >
                       {effective.activeLockout
                         ? `LATCHED (${effective.interlockReasonCode})`
-                        : 'UNLOCKED (正常监控)'}
+                        : 'UNLOCKED (Normal Guard)'}
                     </strong>
                   </span>
                 </span>
                 <span className="text-slate-400">
-                  累计熔断: <strong className="text-amber-300">{state.manualInterlockState.tripCount}</strong> 次
+                  Total Trips: <strong className="text-amber-300">{state.manualInterlockState.tripCount}</strong> times
                 </span>
               </div>
             </div>
@@ -498,7 +498,7 @@ export function CentralCommandDeck() {
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">峰值雨强 (mm/h)</span>
+                    <span className="text-slate-400">Peak Rainfall (mm/h)</span>
                     <span className="font-mono font-bold text-amber-300">
                       {simulationForm.peakIntensityMmPerHr} mm/h
                     </span>
@@ -520,7 +520,7 @@ export function CentralCommandDeck() {
 
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">暴雨开始时刻</span>
+                    <span className="text-slate-400">Storm Start Time</span>
                     <span className="font-mono font-bold text-cyan-300">
                       T+{simulationForm.stormStartHour}:00
                     </span>
@@ -542,9 +542,9 @@ export function CentralCommandDeck() {
 
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">暴雨持续时长</span>
+                    <span className="text-slate-400">Storm Duration</span>
                     <span className="font-mono font-bold text-cyan-300">
-                      {simulationForm.stormDurationHours} 小时
+                      {simulationForm.stormDurationHours} hours
                     </span>
                   </div>
                   <input
@@ -564,7 +564,7 @@ export function CentralCommandDeck() {
 
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">下游平均潮位</span>
+                    <span className="text-slate-400">Downstream Mean Tide</span>
                     <span className="font-mono font-bold text-amber-300">
                       {simulationForm.tideMeanLevelM.toFixed(1)} m
                     </span>
@@ -586,7 +586,7 @@ export function CentralCommandDeck() {
 
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">初始土壤饱和度</span>
+                    <span className="text-slate-400">Initial Soil Saturation</span>
                     <span className="font-mono font-bold text-sky-300">
                       {(simulationForm.initialSoilSaturation * 100).toFixed(0)}%
                     </span>
@@ -608,7 +608,7 @@ export function CentralCommandDeck() {
 
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">雨型轮廓</span>
+                    <span className="text-slate-400">Hyetograph Profile</span>
                     <button
                       type="button"
                       onClick={() =>
@@ -622,12 +622,12 @@ export function CentralCommandDeck() {
                       className="font-mono text-[10px] font-bold text-purple-300 underline"
                     >
                       {simulationForm.stormProfile === 'BLOCK'
-                        ? 'BLOCK (均匀方波)'
-                        : 'TRIANGULAR (单峰三角)'}
+                        ? 'BLOCK (Uniform)'
+                        : 'TRIANGULAR (Single Peak)'}
                     </button>
                   </div>
                   <div className="mt-1 flex justify-between text-[10px] text-slate-400">
-                    <span>风暴增水: +{simulationForm.surgePeakM.toFixed(1)}m</span>
+                    <span>Storm Surge: +{simulationForm.surgePeakM.toFixed(1)}m</span>
                     <input
                       type="range"
                       min={0}
@@ -651,7 +651,7 @@ export function CentralCommandDeck() {
                   onClick={() => state.setSwaggerModalOpen(true)}
                   className="flex items-center gap-1.5 rounded-lg border border-purple-500/60 bg-purple-950/60 px-3 py-1.5 text-xs font-semibold text-purple-200 transition hover:bg-purple-900/80"
                 >
-                  <Terminal className="h-3.5 w-3.5" /> Swagger / JSON 报文注入
+                  <Terminal className="h-3.5 w-3.5" /> Swagger / JSON Payload Injection
                 </button>
 
                 <button
@@ -659,7 +659,7 @@ export function CentralCommandDeck() {
                   onClick={state.applySimulationForm}
                   className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow shadow-cyan-600/30 transition hover:bg-cyan-500"
                 >
-                  <Play className="h-3.5 w-3.5" /> 应用参数并重新推演
+                  <Play className="h-3.5 w-3.5" /> Apply Parameters &amp; Simulate
                 </button>
               </div>
             </div>

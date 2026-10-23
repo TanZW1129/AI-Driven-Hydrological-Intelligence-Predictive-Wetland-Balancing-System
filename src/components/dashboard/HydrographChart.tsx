@@ -63,27 +63,27 @@ export function HydrographChart() {
           <h2 className="flex items-center gap-2 text-xs font-semibold text-white">
             <TrendingDown className="h-4 w-4 text-cyan-400" />
             {state.appMode === 'LIVE'
-              ? '实时实况与未来 24h 排涝预测水文过程线 (点击任意时刻可快进推演)'
-              : '24h 双轨水文历时对比曲线 (AI 智控调蓄 vs 传统固定溢流堰)'}
+              ? 'Live & 24h Predictive Drainage Hydrograph (Click timeline to seek)'
+              : '24h Dual-Track Hydrograph (Smart Control vs Baseline Static Weir)'}
           </h2>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 font-mono text-[10px]">
           <span className="flex items-center gap-1 text-sky-400">
             <span className="inline-block h-2.5 w-2.5 rounded-sm bg-sky-500/70" />
-            雨强(mm/h)
+            Rain (mm/h)
           </span>
           <span className="flex items-center gap-1 text-cyan-300">
             <span className="inline-block h-0.5 w-3 bg-cyan-400" />
-            AI智控水位(m)
+            Smart Level (m)
           </span>
           <span className="flex items-center gap-1 text-orange-400">
             <span className="inline-block h-0.5 w-3 border-b border-dashed border-orange-400 bg-orange-400" />
-            传统无控水位(m)
+            Baseline Level (m)
           </span>
           <span className="flex items-center gap-1 text-amber-300">
             <span className="inline-block h-0.5 w-3 bg-amber-400" />
-            下游潮位(m)
+            Downstream Tide (m)
           </span>
         </div>
       </div>
@@ -141,17 +141,17 @@ export function HydrographChart() {
               labelFormatter={(sec: number) => {
                 if (state.appMode === 'LIVE') {
                   const ms = timeCtx.seriesStartMs + sec * 1_000;
-                  return `大马时间: ${formatShortDate(ms)} ${formatClock(ms)} MYT`;
+                  return `Time: ${formatShortDate(ms)} ${formatClock(ms)} MYT`;
                 }
-                return `仿真时刻: ${formatRelativeClock(sec)}`;
+                return `Sim Time: ${formatRelativeClock(sec)}`;
               }}
               formatter={(value: number, name: string) => {
-                if (name === 'rainfall') return [`${value} mm/h`, '降雨强度'];
-                if (name === 'smartLevel') return [`${value.toFixed(2)} m`, 'AI 智控水位'];
+                if (name === 'rainfall') return [`${value} mm/h`, 'Rainfall Intensity'];
+                if (name === 'smartLevel') return [`${value.toFixed(2)} m`, 'Smart Water Level'];
                 if (name === 'traditionalLevel')
-                  return [`${value.toFixed(2)} m`, '传统无控水位'];
+                  return [`${value.toFixed(2)} m`, 'Baseline Water Level'];
                 if (name === 'downstreamLevel')
-                  return [`${value.toFixed(2)} m`, '下游外河潮位'];
+                  return [`${value.toFixed(2)} m`, 'Downstream Tide Level'];
                 return [value, name];
               }}
             />
@@ -163,7 +163,7 @@ export function HydrographChart() {
               stroke="#ef4444"
               strokeDasharray="4 4"
               label={{
-                value: '3.5m 临界溢流线',
+                value: '3.5m Critical Spillway',
                 fill: '#ef4444',
                 fontSize: 9,
                 position: 'insideTopLeft',
@@ -177,7 +177,7 @@ export function HydrographChart() {
               stroke="#22c55e"
               strokeDasharray="3 3"
               label={{
-                value: '1.0m 生态底线',
+                value: '1.0m Ecological Datum',
                 fill: '#22c55e',
                 fontSize: 9,
                 position: 'insideBottomLeft',

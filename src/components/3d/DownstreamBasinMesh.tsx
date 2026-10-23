@@ -15,7 +15,6 @@ import {
   DOWNSTREAM_DEPTH_Z,
   DOWNSTREAM_WIDTH_X,
   levelToSceneY,
-  SCENE_Y_PER_METRE,
 } from './sceneCoordinates';
 
 interface DownstreamBasinMeshProps {
@@ -23,7 +22,7 @@ interface DownstreamBasinMeshProps {
   wetlandLevelM: number;
 }
 
-const CHANNEL_WALL_HEIGHT_Y = 3.6 * SCENE_Y_PER_METRE;
+const CHANNEL_WALL_HEIGHT_Y = levelToSceneY(3.65);
 
 export function DownstreamBasinMesh({
   downstreamLevelM,
@@ -134,24 +133,23 @@ export function DownstreamBasinMesh({
 
       {/* Downstream Tidal Gauge Floating Tag */}
       <Html
-        position={[DOWNSTREAM_CENTER_X + 2, CHANNEL_WALL_HEIGHT_Y + 0.8, 0]}
+        position={[DOWNSTREAM_CENTER_X - 1.5, CHANNEL_WALL_HEIGHT_Y + 1.2, 0]}
         center
-        distanceFactor={24}
         zIndexRange={[10, 0]}
       >
         <div
-          className={`pointer-events-none select-none whitespace-nowrap rounded-lg border px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur ${
+          className={`pointer-events-none select-none whitespace-nowrap rounded-lg border px-3 py-1.5 text-center font-mono text-[11px] shadow-lg backdrop-blur ${
             isCritical || isTidalLock
               ? 'border-amber-500/80 bg-amber-950/90 text-amber-200'
               : 'border-slate-700 bg-slate-950/90 text-slate-200'
           }`}
         >
           <div className="text-[9px] text-slate-400">
-            下游巴生河/海潮水位 (上限 2.5m)
+            Downstream Tidal Level (Limit 2.5m)
           </div>
           <div className="text-xs font-bold text-amber-300">
             {downstreamLevelM.toFixed(2)} m{' '}
-            {isCritical ? '⚠️ 超限禁排' : isTidalLock ? '⚠️ 防倒灌顶托' : '✓ 正常'}
+            {isCritical ? '⚠️ CRITICAL LIMIT' : isTidalLock ? '⚠️ TIDAL LOCK' : '✓ NORMAL'}
           </div>
         </div>
       </Html>

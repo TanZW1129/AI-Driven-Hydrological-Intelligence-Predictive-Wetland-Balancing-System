@@ -14,6 +14,7 @@ import {
   DEFAULT_CATCHMENT_AREA_HA,
   DOWNSTREAM_CRITICAL_LEVEL_M,
   GATE_MAX_OPENING_M,
+  H_MAX_CRITICAL_M,
   H_MIN_ECOLOGICAL_M,
   H_NORMAL_OPERATING_M,
 } from '../constants/hydrologyConstants';
@@ -189,11 +190,18 @@ export class SmartWetlandStateMachine {
 
     // A. PHASE 2: PEAK-SHAVING (Active heavy storm in progress)
     // When active rain is heavy (>= 20 mm/h), the wetland's operational objective
-    // is detention (gate = 0 m).
+    // is detention (gate = 0 m), unless level exceeds the 3.5m critical spillover limit
+    // and downstream is safe for emergency relief.
     if (currentRainfallMmPerHr >= PEAK_SHAVING_RAIN_INTENSITY_MM_PER_HR) {
-      nextPhase = 'PEAK_SHAVING';
-      targetGateOpeningM = 0;
-      decisionReason = `Active peak storm (i = ${currentRainfallMmPerHr.toFixed(1)} mm/h). Trapping runoff inside wetland.`;
+      if (wetlandLevelM >= H_MAX_CRITICAL_M && preCheckResult.canDischarge) {
+        nextPhase = 'PEAK_SHAVING';
+        targetGateOpeningM = GATE_MAX_OPENING_M;
+        decisionReason = `Super-storm overtopping relief (H = ${wetlandLevelM.toFixed(2)} m >= ${H_MAX_CRITICAL_M.toFixed(1)} m). Emergency gate relief active.`;
+      } else {
+        nextPhase = 'PEAK_SHAVING';
+        targetGateOpeningM = 0;
+        decisionReason = `Active peak storm (i = ${currentRainfallMmPerHr.toFixed(1)} mm/h). Trapping runoff inside wetland.`;
+      }
     }
     // B. EMERGENCY GUARD: Downstream Surge / Backflow Lockout during intended discharge
     else if (this.interlockState.isLockedOut || !monitorResult.evaluation.canDischarge) {

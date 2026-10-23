@@ -10,7 +10,8 @@ import {
   H_MIN_ECOLOGICAL_M,
   H_NORMAL_OPERATING_M,
 } from '../../constants/hydrologyConstants';
-import { levelToSceneY, SCENE_Y_PER_METRE } from './sceneCoordinates';
+import { levelToSceneY } from './sceneCoordinates';
+import { GAUGE_TOWER_POS } from './WetlandParkTerrain';
 
 interface LevelGaugeMarkerProps {
   currentLevelM: number;
@@ -22,16 +23,16 @@ const THRESHOLD_RINGS: ReadonlyArray<{
   label: string;
   color: string;
 }> = [
-  { levelM: H_MIN_ECOLOGICAL_M, label: '1.0m 生态底线', color: '#22c55e' },
-  { levelM: H_NORMAL_OPERATING_M, label: '2.0m 常态水位', color: '#38bdf8' },
-  { levelM: H_MAX_CRITICAL_M, label: '3.5m 溢流红线', color: '#ef4444' },
+  { levelM: H_MIN_ECOLOGICAL_M, label: '1.0m Ecological Datum', color: '#22c55e' },
+  { levelM: H_NORMAL_OPERATING_M, label: '2.0m Baseline', color: '#38bdf8' },
+  { levelM: H_MAX_CRITICAL_M, label: '3.5m Spillway Threshold', color: '#ef4444' },
 ];
 
 export function LevelGaugeMarker({
   currentLevelM,
-  position = [-4.2, 0, -4.2],
+  position = GAUGE_TOWER_POS,
 }: LevelGaugeMarkerProps) {
-  const towerHeight = 4.2 * SCENE_Y_PER_METRE;
+  const towerHeight = levelToSceneY(4.15);
   const currentY = levelToSceneY(currentLevelM);
 
   return (
@@ -85,12 +86,11 @@ export function LevelGaugeMarker({
       <Html
         position={[0, towerHeight + 0.9, 0]}
         center
-        distanceFactor={22}
         zIndexRange={[10, 0]}
       >
         <div className="pointer-events-none select-none whitespace-nowrap rounded-lg border border-cyan-500/50 bg-slate-950/90 px-2.5 py-1 text-center font-mono text-[11px] shadow-lg backdrop-blur">
           <div className="text-[9px] uppercase tracking-wider text-slate-400">
-            湿地超声波液位计
+            Ultrasonic Level Gauge
           </div>
           <div className="text-xs font-bold text-cyan-300">
             {currentLevelM.toFixed(2)} m

@@ -34,7 +34,7 @@ export function TelemetryDiagnostic() {
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-cyan-400" />
           <h2 className="text-xs font-semibold text-white">
-            智能状态机决策 &amp; 下游安全联锁实验台
+            State Machine Decision &amp; Safety Interlock Testbed
           </h2>
         </div>
 
@@ -49,7 +49,7 @@ export function TelemetryDiagnostic() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            AI 自主控闸
+            AI Autonomous
           </button>
           <button
             type="button"
@@ -60,7 +60,7 @@ export function TelemetryDiagnostic() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            人工强制干预
+            Manual Override
           </button>
         </div>
       </div>
@@ -75,9 +75,9 @@ export function TelemetryDiagnostic() {
       >
         <div className="mb-1 flex items-center justify-between text-[10px] text-slate-400">
           <span className="flex items-center gap-1 font-semibold text-cyan-400">
-            <Radio className="h-3 w-3 animate-pulse" /> 实时控制决策输出
+            <Radio className="h-3 w-3 animate-pulse" /> Live Control Rationale
           </span>
-          <span>6h预计雨量: {effective.forecast6hRainMm} mm</span>
+          <span>Forecast 6h Rain: {effective.forecast6hRainMm} mm</span>
         </div>
         <div>{effective.decisionReason}</div>
       </div>
@@ -87,7 +87,7 @@ export function TelemetryDiagnostic() {
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
             <Sliders className="h-3.5 w-3.5" />
-            全生命周期下游安全联锁实时验证器
+            Full-Lifecycle Downstream Safety Interlock Verifier
           </span>
           {state.manualInterlockState.isLockedOut && (
             <button
@@ -95,7 +95,7 @@ export function TelemetryDiagnostic() {
               onClick={state.resetInterlockLatch}
               className="flex items-center gap-1 rounded bg-slate-800 px-2 py-0.5 font-mono text-[10px] text-slate-300 hover:bg-slate-700"
             >
-              <RotateCcw className="h-3 w-3" /> 复位闭锁计数
+              <RotateCcw className="h-3 w-3" /> Reset Latch Trips
             </button>
           )}
         </div>
@@ -105,11 +105,11 @@ export function TelemetryDiagnostic() {
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-slate-400">
               {state.controlMode === 'MANUAL_OVERRIDE'
-                ? '人工指令水闸开度 (请求值):'
-                : 'AI 状态机指令开度 (切换到人工可手调):'}
+                ? 'Manual Target Gate Opening (Requested):'
+                : 'AI State Machine Target (Switch to Manual to Adjust):'}
             </span>
             <span className="font-mono font-bold text-purple-300">
-              请求 {effective.targetGateOpeningM.toFixed(2)}m → 实际安全执行{' '}
+              Target {effective.targetGateOpeningM.toFixed(2)}m → Actual Guarded{' '}
               <strong
                 className={
                   effective.gateOpeningM > 0 ? 'text-emerald-400' : 'text-red-400'
@@ -154,7 +154,7 @@ export function TelemetryDiagnostic() {
                 }
                 className="rounded accent-amber-500"
               />
-              <span>注入实时下游水位突增 (模拟排水中途涨潮/下游超标)</span>
+              <span>Inject Downstream Surge (Simulate mid-drain storm tide / river overflow)</span>
             </label>
             <span
               className={`font-mono font-bold ${
@@ -179,9 +179,9 @@ export function TelemetryDiagnostic() {
             className="w-full accent-amber-500"
           />
           <div className="flex justify-between font-mono text-[10px] text-slate-400">
-            <span>0.6m (低潮安全)</span>
-            <span className="text-emerald-400">≤2.35m 迟滞解锁线</span>
-            <span className="text-red-400">≥2.50m 瞬时熔断关闸</span>
+            <span>0.6m (Low Tide Safe)</span>
+            <span className="text-emerald-400">≤2.35m Hysteresis Unlock</span>
+            <span className="text-red-400">≥2.50m Instant Safety Trip</span>
           </div>
         </div>
 
@@ -194,18 +194,18 @@ export function TelemetryDiagnostic() {
               <Unlock className="h-3.5 w-3.5 text-emerald-400" />
             )}
             <span className="text-slate-300">
-              闭锁状态:{' '}
+              Interlock Status:{' '}
               <strong
                 className={
                   effective.activeLockout ? 'text-red-400' : 'text-emerald-400'
                 }
               >
-                {effective.activeLockout ? 'LATCHED (紧急闭锁中)' : 'UNLOCKED'}
+                {effective.activeLockout ? 'LATCHED (Emergency Trip)' : 'UNLOCKED'}
               </strong>
             </span>
           </span>
           <span className="text-slate-400">
-            累计触发熔断: <strong className="text-amber-300">{state.manualInterlockState.tripCount}</strong> 次
+            Total Safety Trips: <strong className="text-amber-300">{state.manualInterlockState.tripCount}</strong> times
           </span>
         </div>
 
@@ -231,25 +231,25 @@ export function TelemetryDiagnostic() {
       {/* Virtual IoT Sensor Telemetry Strip */}
       <div className="grid grid-cols-3 gap-2 font-mono text-[10px]">
         <div className="rounded-lg border border-slate-800 bg-slate-950/70 p-2">
-          <div className="text-slate-400">超声波液位计</div>
+          <div className="text-slate-400">Ultrasonic Level Sensor</div>
           <div className="mt-0.5 text-xs font-bold text-cyan-300">
             {effective.measuredWetlandLevelM.toFixed(3)} m
           </div>
           <div className="text-[9px] text-emerald-400">STATUS: HEALTHY</div>
         </div>
         <div className="rounded-lg border border-slate-800 bg-slate-950/70 p-2">
-          <div className="text-slate-400">土壤湿度传感器</div>
+          <div className="text-slate-400">Soil Moisture Sensor</div>
           <div className="mt-0.5 text-xs font-bold text-sky-300">
             {(effective.soilSaturation * 100).toFixed(1)}%
           </div>
           <div className="text-[9px] text-slate-400">TDR 0–7cm</div>
         </div>
         <div className="rounded-lg border border-slate-800 bg-slate-950/70 p-2">
-          <div className="text-slate-400">水闸执行电机</div>
+          <div className="text-slate-400">Sluice Gate Actuator</div>
           <div className="mt-0.5 text-xs font-bold text-purple-300">
             0.05 m/s
           </div>
-          <div className="text-[9px] text-slate-400">行程 0.0–2.0m</div>
+          <div className="text-[9px] text-slate-400">Stroke 0.0–2.0m</div>
         </div>
       </div>
     </div>

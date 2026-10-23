@@ -73,7 +73,7 @@ export function SwaggerConsoleModal() {
     clearFeedback();
     try {
       state.applyCustomJsonScenario(jsonText);
-      setSuccessBanner('OpenAPI 3.0 校验通过！已成功注入 3D 数字孪生沙盘。');
+      setSuccessBanner('OpenAPI 3.0 validation passed! Successfully injected into 3D digital twin sandbox.');
     } catch (err) {
       if (err instanceof ScenarioValidationError) {
         setErrorBanner(`[${err.code}] ${err.message}`);
@@ -153,14 +153,14 @@ export function SwaggerConsoleModal() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-white">
-                  Swagger / OpenAPI 3.0 气象与潮汐场景注入控制台
+                  Swagger / OpenAPI 3.0 Scenario Injection Console
                 </h2>
                 <span className="rounded bg-emerald-950 px-2 py-0.5 font-mono text-[10px] text-emerald-400 border border-emerald-800">
                   OAS {WEATHER_OPENAPI_SPEC.openapi}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                无需等待现实暴雨，直接粘贴自定义 JSON 或配置风暴参数即可驱动 3D 湿地沙盘推演
+                Inject custom JSON payloads or configure storm parameters to drive 3D digital twin simulation
               </p>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function SwaggerConsoleModal() {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            <FileJson className="h-4 w-4" /> 模式 A · Raw JSON 载荷直投 (Swagger Body)
+            <FileJson className="h-4 w-4" /> Mode A · Raw JSON Payload (Swagger Body)
           </button>
 
           <button
@@ -203,7 +203,7 @@ export function SwaggerConsoleModal() {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            <Sliders className="h-4 w-4" /> 模式 B · 可视化风暴/潮位参数合成器
+            <Sliders className="h-4 w-4" /> Mode B · Parametric Storm &amp; Tidal Builder
           </button>
 
           <button
@@ -218,7 +218,7 @@ export function SwaggerConsoleModal() {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            <Code2 className="h-4 w-4" /> OpenAPI 3.0 契约规范 &amp; 远程 URL
+            <Code2 className="h-4 w-4" /> OpenAPI 3.0 Contract &amp; Remote Endpoint
           </button>
         </div>
 
@@ -229,7 +229,7 @@ export function SwaggerConsoleModal() {
             <div className="rounded-xl border border-red-700 bg-red-950/80 p-3.5 text-xs text-red-200">
               <div className="flex items-center gap-2 font-bold text-red-300">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
-                <span>Schema 校验拦截 (Fail-Safe)：{errorBanner}</span>
+                <span>Schema Validation Blocked (Fail-Safe): {errorBanner}</span>
               </div>
               {errorIssues.length > 0 && (
                 <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-[11px] text-red-300">
@@ -255,8 +255,8 @@ export function SwaggerConsoleModal() {
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="font-mono text-slate-300">
-                  POST <strong className="text-purple-400">/api/v1/scenarios/custom/json</strong> — 符合{' '}
-                  <code>CustomScenarioInput</code> 契约
+                  POST <strong className="text-purple-400">/api/v1/scenarios/custom/json</strong> — conforms to{' '}
+                  <code>CustomScenarioInput</code> contract
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -267,7 +267,7 @@ export function SwaggerConsoleModal() {
                     }}
                     className="rounded border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] text-slate-300 hover:bg-slate-700"
                   >
-                    载入示例：季风特大暴雨+涨潮
+                    Load Sample: Monsoon Storm + Tidal Surge
                   </button>
                   <button
                     type="button"
@@ -287,7 +287,7 @@ export function SwaggerConsoleModal() {
                     }}
                     className="rounded border border-red-800/70 bg-red-950/40 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-900/50"
                   >
-                    测试非法数据拦截 (负降雨)
+                    Test Invalid Payload (Negative Rain)
                   </button>
                 </div>
               </div>
@@ -302,14 +302,14 @@ export function SwaggerConsoleModal() {
 
               <div className="flex items-center justify-between text-[11px] text-slate-400">
                 <span>
-                  提示：<code>soilSaturation</code>、<code>downstreamLevelM</code>、<code>timeIso</code> 若省略将由系统水文与潮汐模型自动推导补齐。
+                  Note: <code>soilSaturation</code>, <code>downstreamLevelM</code>, and <code>timeIso</code> are automatically derived by hydrology &amp; tidal models if omitted.
                 </span>
                 <button
                   type="button"
                   onClick={handleInjectRawJson}
                   className="flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500"
                 >
-                  <Play className="h-4 w-4" /> Execute · 校验并注入 3D 沙盘
+                  <Play className="h-4 w-4" /> Execute · Validate &amp; Inject
                 </button>
               </div>
             </div>
@@ -320,7 +320,7 @@ export function SwaggerConsoleModal() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-400">自定义情景名称</label>
+                  <label className="text-xs text-slate-400">Custom Scenario Name</label>
                   <input
                     type="text"
                     value={paramScenarioName}
@@ -330,20 +330,20 @@ export function SwaggerConsoleModal() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-slate-400">风暴雨型轮廓 (Profile Shape)</label>
+                  <label className="text-xs text-slate-400">Storm Hyetograph Profile</label>
                   <select
                     value={stormProfile}
                     onChange={(e) => setStormProfile(e.target.value as StormProfileShape)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white"
                   >
-                    <option value="TRIANGULAR">TRIANGULAR (单峰三角形暴雨)</option>
-                    <option value="BLOCK">BLOCK (均匀方波持续暴雨)</option>
+                    <option value="TRIANGULAR">TRIANGULAR (Single Peak)</option>
+                    <option value="BLOCK">BLOCK (Uniform Sustained Storm)</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">暴雨开始小时 (预泄洪窗口)</span>
+                    <span className="text-slate-400">Storm Start Hour (Pre-discharge Window)</span>
                     <span className="font-mono font-bold text-cyan-300">T+{stormStartHour} h</span>
                   </div>
                   <input
@@ -359,8 +359,8 @@ export function SwaggerConsoleModal() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">暴雨持续时长</span>
-                    <span className="font-mono font-bold text-cyan-300">{stormDurationHours} 小时</span>
+                    <span className="text-slate-400">Storm Duration</span>
+                    <span className="font-mono font-bold text-cyan-300">{stormDurationHours} hours</span>
                   </div>
                   <input
                     type="range"
@@ -375,7 +375,7 @@ export function SwaggerConsoleModal() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">峰值降雨强度 (i_peak)</span>
+                    <span className="text-slate-400">Peak Rainfall Intensity (i_peak)</span>
                     <span className="font-mono font-bold text-amber-300">{peakRainMmPerHr} mm/h</span>
                   </div>
                   <input
@@ -391,7 +391,7 @@ export function SwaggerConsoleModal() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">初始土壤湿度饱和度 (S_0)</span>
+                    <span className="text-slate-400">Initial Soil Saturation (S_0)</span>
                     <span className="font-mono font-bold text-sky-300">
                       {(initialSoil * 100).toFixed(0)}%
                     </span>
@@ -409,7 +409,7 @@ export function SwaggerConsoleModal() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">下游巴生海峡平均潮位</span>
+                    <span className="text-slate-400">Downstream Mean Tidal Level</span>
                     <span className="font-mono font-bold text-amber-300">{tideMeanM.toFixed(2)} m</span>
                   </div>
                   <input
@@ -425,7 +425,7 @@ export function SwaggerConsoleModal() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-400">叠加风暴增水峰值 (Storm Surge)</span>
+                    <span className="text-slate-400">Peak Storm Surge Amplitude</span>
                     <span className="font-mono font-bold text-red-400">+{tideSurgePeakM.toFixed(2)} m</span>
                   </div>
                   <input
@@ -446,7 +446,7 @@ export function SwaggerConsoleModal() {
                   onClick={handleBuildParametric}
                   className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-600/30 transition hover:bg-cyan-500"
                 >
-                  <Play className="h-4 w-4" /> 合成 24h 时序并运行双轨推演
+                  <Play className="h-4 w-4" /> Synthesize 24h Series &amp; Simulate
                 </button>
               </div>
             </div>
@@ -457,7 +457,7 @@ export function SwaggerConsoleModal() {
             <div className="space-y-4">
               <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-950 p-4">
                 <label className="flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
-                  <Globe className="h-4 w-4" /> 从远程 HTTP(S) Mock API 端点拉取场景 JSON
+                  <Globe className="h-4 w-4" /> Ingest Scenario JSON from Remote HTTP(S) Endpoint
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -478,7 +478,7 @@ export function SwaggerConsoleModal() {
 
               <div className="space-y-1.5">
                 <div className="text-xs font-semibold text-slate-300">
-                  OpenAPI 3.0.3 完整契约定义 (WEATHER_OPENAPI_SPEC)
+                  OpenAPI 3.0.3 Contract Specification (WEATHER_OPENAPI_SPEC)
                 </div>
                 <pre className="max-h-72 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-3.5 font-mono text-[11px] text-slate-300">
                   {JSON.stringify(WEATHER_OPENAPI_SPEC, null, 2)}

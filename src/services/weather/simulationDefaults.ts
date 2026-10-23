@@ -30,7 +30,7 @@ export interface SimulationFormValues {
 }
 
 export const DEFAULT_SIMULATION_FORM: Readonly<SimulationFormValues> = Object.freeze({
-  scenarioName: '自定义暴雨场景 (4h 后 80 mm/h)',
+  scenarioName: 'Custom Convective Storm (80 mm/h @ T+4h)',
   horizonHours: 24,
   initialSoilSaturation: 0.4,
   stormStartHour: 4,

@@ -19,8 +19,8 @@ import { GATE_MAX_OPENING_M } from '../../constants/hydrologyConstants';
 import type { ControlPhase, InterlockReasonCode } from '../../types/hydrology';
 import {
   GATE_DAM_X,
+  levelToSceneY,
   SCENE_Y_PER_METRE,
-  WETLAND_DEPTH_Z,
 } from './sceneCoordinates';
 
 interface SluiceGateMeshProps {
@@ -32,8 +32,8 @@ interface SluiceGateMeshProps {
   interlockReasonCode: InterlockReasonCode;
 }
 
-const DAM_HEIGHT_Y = 3.9 * SCENE_Y_PER_METRE;
-const GATE_LEAF_HEIGHT_Y = GATE_MAX_OPENING_M * SCENE_Y_PER_METRE;
+const DAM_HEIGHT_Y = levelToSceneY(3.85);
+const GATE_LEAF_HEIGHT_Y = levelToSceneY(GATE_MAX_OPENING_M);
 const BAY_OFFSETS_Z: readonly [number, number] = [-2.1, 2.1];
 
 const PHASE_BEACON_COLORS: Readonly<Record<ControlPhase, string>> = {
@@ -93,14 +93,14 @@ export function SluiceGateMesh({
 
   return (
     <group position={[GATE_DAM_X, 0, 0]}>
-      {/* North & South Concrete Wing Walls */}
-      <mesh position={[0, DAM_HEIGHT_Y / 2, -6.5]} receiveShadow castShadow>
-        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 4.6]} />
-        <meshStandardMaterial color="#475569" roughness={0.75} />
+      {/* North & South Eco-Integrated Wing Walls (Connecting Wetland Bank to Downstream Channel) */}
+      <mesh position={[0, DAM_HEIGHT_Y / 2, -5.4]} receiveShadow castShadow>
+        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 3.2]} />
+        <meshStandardMaterial color="#475569" roughness={0.78} />
       </mesh>
-      <mesh position={[0, DAM_HEIGHT_Y / 2, 6.5]} receiveShadow castShadow>
-        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 4.6]} />
-        <meshStandardMaterial color="#475569" roughness={0.75} />
+      <mesh position={[0, DAM_HEIGHT_Y / 2, 5.4]} receiveShadow castShadow>
+        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 3.2]} />
+        <meshStandardMaterial color="#475569" roughness={0.78} />
       </mesh>
 
       {/* Outer & Centre Sluice Gate Piers */}
@@ -211,7 +211,6 @@ export function SluiceGateMesh({
       <Html
         position={[0, DAM_HEIGHT_Y + 3.65, 0]}
         center
-        distanceFactor={22}
         zIndexRange={[10, 0]}
       >
         <div
@@ -222,32 +221,16 @@ export function SluiceGateMesh({
           }`}
         >
           <div className="text-[9px] uppercase tracking-wider text-slate-400">
-            双孔电动水闸 ({openingPct}%)
+            Dual Sluice Gates ({openingPct}%)
           </div>
           <div className="text-xs font-bold">
-            开度 {gateOpeningM.toFixed(2)}m → 目标 {targetGateOpeningM.toFixed(1)}m
+            Actual {gateOpeningM.toFixed(2)}m → Target {targetGateOpeningM.toFixed(1)}m
           </div>
           <div className="text-[10px] text-emerald-300">
             Q_out: {outflowM3PerS.toFixed(1)} m³/s ({interlockReasonCode})
           </div>
         </div>
       </Html>
-
-      {/* Outer retaining wall segments closing the wetland perimeter */}
-      <mesh
-        position={[0, DAM_HEIGHT_Y / 2, -(WETLAND_DEPTH_Z / 2 + 0.5)]}
-        receiveShadow
-      >
-        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 1.2]} />
-        <meshStandardMaterial color="#334155" />
-      </mesh>
-      <mesh
-        position={[0, DAM_HEIGHT_Y / 2, WETLAND_DEPTH_Z / 2 + 0.5]}
-        receiveShadow
-      >
-        <boxGeometry args={[1.6, DAM_HEIGHT_Y, 1.2]} />
-        <meshStandardMaterial color="#334155" />
-      </mesh>
     </group>
   );
 }

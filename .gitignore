@@ -12,6 +12,7 @@ plans/
 
 # Temporary and local inspection scripts
 scripts/inspect-web.mjs
+scripts/verify-english-ui.mjs
 *.png
 *.jpg
 *.jpeg

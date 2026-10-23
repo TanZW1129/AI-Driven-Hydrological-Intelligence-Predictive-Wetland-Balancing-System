@@ -805,9 +805,9 @@ export function selectEffectiveFrame(state: SimulationStoreState): EffectiveFram
   const phase: ControlPhase = preEval.canDischarge ? frame.smart.phase : 'INTERLOCK_SUSPENDED';
 
   const decisionReason = !preEval.canDischarge
-    ? `[安全联锁强制拦截] ${preEval.diagnosticMessage}`
+    ? `[Safety Interlock Lockout] ${preEval.diagnosticMessage}`
     : state.controlMode === 'MANUAL_OVERRIDE'
-      ? `[人工干预模式] 操作员请求开度 ${requestedGateM.toFixed(2)} m，下游安全校验通过，执行开度 ${appliedGateM.toFixed(2)} m。`
+      ? `[Manual Override] Requested opening: ${requestedGateM.toFixed(2)}m. Downstream safety permitted, executing ${appliedGateM.toFixed(2)}m.`
       : frame.smart.decisionReason;
 
   return {

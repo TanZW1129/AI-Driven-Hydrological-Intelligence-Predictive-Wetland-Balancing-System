@@ -35,31 +35,31 @@ const PHASE_META: Readonly<
   >
 > = {
   NORMAL: {
-    label: 'PHASE 0 · 常态生态维持',
+    label: 'PHASE 0 · Baseline Retention',
     sublabel: 'Normal Mode (2.0m Baseline)',
     badgeClass: 'border-emerald-500/50 bg-emerald-950/60 text-emerald-300',
     dotClass: 'bg-emerald-400',
   },
   PRE_DISCHARGE: {
-    label: 'PHASE 1 · 预测性主动预泄洪',
+    label: 'PHASE 1 · Predictive Pre-Discharge',
     sublabel: 'Proactive Pre-Discharge (→1.0m)',
     badgeClass: 'border-blue-500/60 bg-blue-950/60 text-blue-300',
     dotClass: 'bg-blue-400 animate-ping',
   },
   PEAK_SHAVING: {
-    label: 'PHASE 2 · 暴雨削峰滞洪',
+    label: 'PHASE 2 · Peak-Shaving Detention',
     sublabel: 'Peak-Shaving Detention (Gates 0%)',
     badgeClass: 'border-amber-500/60 bg-amber-950/60 text-amber-300',
     dotClass: 'bg-amber-400 animate-pulse',
   },
   RECOVERY: {
-    label: 'PHASE 3 · 洪后受控恢复',
+    label: 'PHASE 3 · Post-Storm Recovery',
     sublabel: 'Post-Storm Recovery (→2.0m)',
     badgeClass: 'border-purple-500/60 bg-purple-950/60 text-purple-300',
     dotClass: 'bg-purple-400',
   },
   INTERLOCK_SUSPENDED: {
-    label: 'SAFE HALT · 下游联锁熔断挂起',
+    label: 'SAFE HALT · Downstream Lockout',
     sublabel: 'Downstream Interlock Lockout (0m)',
     badgeClass: 'border-red-500/80 bg-red-950/80 text-red-200 animate-pulse',
     dotClass: 'bg-red-500 animate-ping',
@@ -90,7 +90,7 @@ export function TopKpiBar() {
       <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/90 p-3.5 shadow">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-slate-400">
-            系统运行阶段 (Control Phase)
+            System Control Phase
           </span>
           <Activity className="h-4 w-4 text-cyan-400" />
         </div>
@@ -105,7 +105,7 @@ export function TopKpiBar() {
         <div className="flex items-center justify-between font-mono text-[11px] text-slate-400">
           <span>{phaseInfo.sublabel}</span>
           <span className="text-cyan-400">
-            {state.controlMode === 'AUTO_AI' ? 'AI自主' : '人工干预'}
+            {state.controlMode === 'AUTO_AI' ? 'AI Autonomous' : 'Manual Override'}
           </span>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function TopKpiBar() {
       <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/90 p-3.5 shadow">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-slate-400">
-            125英亩湿地水位 &amp; 剩余库容
+            125-Acre Wetland Level &amp; Retention
           </span>
           <Gauge className="h-4 w-4 text-sky-400" />
         </div>
@@ -125,11 +125,11 @@ export function TopKpiBar() {
             </span>
             <span className="ml-1 text-xs text-slate-400">m</span>
             <span className="ml-2 text-xs text-orange-300">
-              (传统: {effective.traditionalLevelM.toFixed(2)}m)
+              (Baseline: {effective.traditionalLevelM.toFixed(2)}m)
             </span>
           </div>
           <span className="text-xs font-semibold text-sky-400">
-            {capacityPct.toFixed(0)}% 蓄满度
+            {capacityPct.toFixed(0)}% Filled
           </span>
         </div>
         <div className="space-y-1">
@@ -146,8 +146,8 @@ export function TopKpiBar() {
             />
           </div>
           <div className="flex justify-between font-mono text-[10px] text-slate-400">
-            <span>可用缓冲: {effective.availableBufferM3.toLocaleString()} m³</span>
-            <span>警戒线: 3.50m</span>
+            <span>Buffer Avail: {effective.availableBufferM3.toLocaleString()} m³</span>
+            <span>Spillway: 3.50m</span>
           </div>
         </div>
       </div>
@@ -156,14 +156,14 @@ export function TopKpiBar() {
       <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/90 p-3.5 shadow">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-slate-400">
-            进出水流量平衡 &amp; 电动水闸
+            Hydraulic Balance &amp; Sluice Gates
           </span>
           <Droplets className="h-4 w-4 text-cyan-400" />
         </div>
         <div className="my-1 grid grid-cols-2 gap-2 font-mono">
           <div className="rounded-lg bg-slate-950/80 px-2.5 py-1">
             <div className="flex items-center gap-1 text-[10px] text-slate-400">
-              <ArrowDownRight className="h-3 w-3 text-sky-400" /> 入流 Q_in
+              <ArrowDownRight className="h-3 w-3 text-sky-400" /> Inflow Q_in
             </div>
             <div className="text-sm font-bold text-sky-300">
               {effective.inflowM3PerS.toFixed(1)} <span className="text-[10px]">m³/s</span>
@@ -171,7 +171,7 @@ export function TopKpiBar() {
           </div>
           <div className="rounded-lg bg-slate-950/80 px-2.5 py-1">
             <div className="flex items-center gap-1 text-[10px] text-slate-400">
-              <ArrowUpRight className="h-3 w-3 text-emerald-400" /> 出流 Q_out
+              <ArrowUpRight className="h-3 w-3 text-emerald-400" /> Outflow Q_out
             </div>
             <div className="text-sm font-bold text-emerald-300">
               {effective.outflowM3PerS.toFixed(1)} <span className="text-[10px]">m³/s</span>
@@ -180,9 +180,9 @@ export function TopKpiBar() {
         </div>
         <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
           <span>
-            水闸开度: <strong className="text-white">{effective.gateOpeningM.toFixed(2)}m</strong> ({gateOpenPct}%)
+            Gate Opening: <strong className="text-white">{effective.gateOpeningM.toFixed(2)}m</strong> ({gateOpenPct}%)
           </span>
-          <span>当前雨强: {effective.rainfallIntensityMmPerHr} mm/h</span>
+          <span>Rain Rate: {effective.rainfallIntensityMmPerHr} mm/h</span>
         </div>
       </div>
 
@@ -190,7 +190,7 @@ export function TopKpiBar() {
       <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/90 p-3.5 shadow">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-slate-400">
-            下游巴生潮位 &amp; 绝对安全联锁
+            Downstream Tide &amp; Safety Interlock
           </span>
           {effective.canDischarge ? (
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
@@ -218,11 +218,11 @@ export function TopKpiBar() {
                 : 'bg-red-950 text-red-200 border border-red-700'
             }`}
           >
-            {effective.canDischarge ? '✓ 允许安全排水' : '⛔ 联锁闭锁禁排'}
+            {effective.canDischarge ? '✓ Discharge Permitted' : '⛔ Interlock Locked'}
           </span>
         </div>
         <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
-          <span>水头差 ΔH: {headDiffM >= 0 ? `+${headDiffM.toFixed(2)}` : headDiffM.toFixed(2)}m</span>
+          <span>Head Diff ΔH: {headDiffM >= 0 ? `+${headDiffM.toFixed(2)}` : headDiffM.toFixed(2)}m</span>
           <span className="truncate text-amber-300" title={effective.interlockReasonCode}>
             {effective.interlockReasonCode}
           </span>
@@ -233,7 +233,7 @@ export function TopKpiBar() {
       <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/90 p-3.5 shadow">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-medium text-slate-400">
-            AI 智控 vs 传统湿地减灾成效
+            Smart Control vs Baseline Mitigation
           </span>
           {summary.smart.totalOverflowVolumeM3 === 0 ? (
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -246,12 +246,12 @@ export function TopKpiBar() {
             <span className="text-xl font-bold text-emerald-400">
               +{summary.mitigation.avoidedOverflowVolumeM3.toLocaleString()}
             </span>
-            <span className="ml-1 text-xs text-slate-400">m³ 避免溢流</span>
+            <span className="ml-1 text-xs text-slate-400">m³ Overflow Avoided</span>
           </div>
         </div>
         <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
           <span>
-            传统峰值:{' '}
+            Baseline Peak:{' '}
             <strong
               className={
                 summary.traditional.peakWaterLevelM > H_MAX_CRITICAL_M
@@ -263,11 +263,11 @@ export function TopKpiBar() {
             </strong>
           </span>
           <span>
-            AI峰值:{' '}
+            Smart Peak:{' '}
             <strong className="text-emerald-300">
               {summary.smart.peakWaterLevelM.toFixed(2)}m
             </strong>{' '}
-            (削峰 {summary.mitigation.peakLevelReductionM.toFixed(2)}m)
+            (Reduced by {summary.mitigation.peakLevelReductionM.toFixed(2)}m)
           </span>
         </div>
       </div>

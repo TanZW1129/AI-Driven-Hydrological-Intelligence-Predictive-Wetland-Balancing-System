@@ -28,10 +28,10 @@ import { SluiceGateMesh } from './SluiceGateMesh';
 import { WetlandBasinMesh } from './WetlandBasinMesh';
 
 const PRESET_BUTTONS: ReadonlyArray<{ id: CameraViewPreset; label: string }> = [
-  { id: 'OVERVIEW', label: '全景概览' },
-  { id: 'GATE', label: '聚焦水闸' },
-  { id: 'WETLAND', label: '125英亩湿地' },
-  { id: 'DOWNSTREAM', label: '下游海潮' },
+  { id: 'OVERVIEW', label: 'Overview' },
+  { id: 'GATE', label: 'Sluice Gate' },
+  { id: 'WETLAND', label: '125-Acre Wetland' },
+  { id: 'DOWNSTREAM', label: 'Downstream Tide' },
 ];
 
 export function WetlandSceneCanvas() {
@@ -51,7 +51,7 @@ export function WetlandSceneCanvas() {
         <div className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/85 px-3 py-1.5 backdrop-blur">
           <Layers className="h-4 w-4 text-cyan-400" />
           <span className="text-xs font-semibold text-white">
-            BBR 125英亩湿地 3D 数字孪生沙盘
+            BBR 125-Acre Wetland 3D Digital Twin
           </span>
           <span
             className={`flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[10px] font-semibold ${
@@ -65,31 +65,31 @@ export function WetlandSceneCanvas() {
             <Radio className="h-2.5 w-2.5 animate-pulse" />
             {timeCtx.mode === 'LIVE'
               ? timeCtx.isForecast
-                ? `未来推演 · ${timeBadgeText}`
+                ? `Forecast · ${timeBadgeText}`
                 : timeCtx.isHindcast
-                  ? `历史回溯 · ${timeBadgeText}`
-                  : `实时实况 · ${timeBadgeText}`
-              : `模拟推演 · ${timeBadgeText}`}
+                  ? `Hindcast · ${timeBadgeText}`
+                  : `Live Real-Time · ${timeBadgeText}`
+              : `Simulation · ${timeBadgeText}`}
           </span>
         </div>
 
         <div className="hidden items-center gap-2.5 rounded-xl border border-slate-800/80 bg-slate-950/80 px-3 py-1.5 font-mono text-[10px] text-slate-300 backdrop-blur xl:flex">
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
-            1.0m 生态底线
+            1.0m Ecological Datum
           </span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-sky-400" />
-            2.0m 常态
+            2.0m Baseline
           </span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
-            3.5m 溢流红线
+            3.5m Spillway Threshold
           </span>
           {state.showTraditionalGhostIn3D && (
             <span className="flex items-center gap-1 text-orange-300">
               <span className="inline-block h-2 w-2 border border-orange-400" />
-              传统无控水位 ({effective.traditionalLevelM.toFixed(2)}m)
+              Baseline Water Level ({effective.traditionalLevelM.toFixed(2)}m)
             </span>
           )}
         </div>
@@ -118,7 +118,7 @@ export function WetlandSceneCanvas() {
         <button
           type="button"
           onClick={state.toggleTraditionalGhost}
-          title="在 3D 沙盘中显示/隐藏传统无控湿地水位网格对比"
+          title="Toggle baseline water level comparison wireframe"
           className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[11px] font-medium backdrop-blur transition-all ${
             state.showTraditionalGhostIn3D
               ? 'border-orange-500/60 bg-orange-950/70 text-orange-200'
@@ -130,16 +130,16 @@ export function WetlandSceneCanvas() {
           ) : (
             <EyeOff className="h-3.5 w-3.5" />
           )}
-          传统对比网
+          Baseline Ghost
         </button>
       </div>
 
       {/* Bottom-Left HUD Hint */}
       <div className="pointer-events-none absolute bottom-2.5 left-3.5 z-10 flex items-center gap-3 rounded-lg bg-slate-950/75 px-2.5 py-1 font-mono text-[10px] text-slate-400 backdrop-blur">
-        <span>左键: 360°旋转 · 右键: 平移 · 滚轮: 缩放</span>
+        <span>LMB: Orbit · RMB: Pan · Scroll: Zoom</span>
         <span className="text-slate-600">|</span>
         <span className="text-cyan-300">
-          当前水深: {effective.wetlandLevelM.toFixed(2)}m · 水闸开度: {effective.gateOpeningM.toFixed(2)}m · 出流: {effective.outflowM3PerS.toFixed(1)} m³/s
+          Wetland: {effective.wetlandLevelM.toFixed(2)}m · Gate: {effective.gateOpeningM.toFixed(2)}m · Outflow: {effective.outflowM3PerS.toFixed(1)} m³/s
         </span>
       </div>
 
